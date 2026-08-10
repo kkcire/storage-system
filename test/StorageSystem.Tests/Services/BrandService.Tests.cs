@@ -78,5 +78,32 @@ public class BrandServiceTests
         Assert.Throws<ArgumentOutOfRangeException>(() => _service.Update(invalidId, "Spotify"));
     }
 
+    [Fact]
+    public void GetById_WithValidId_ReturnsBrand()
+    {
+
+        Brand brand = _service.Add("Fender");
+        Brand result = _service.GetById(brand.Id);
+
+        Assert.NotNull(result);
+        Assert.Equal(brand.Id, result.Id);
+        Assert.Equal(brand.Name, result.Name);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-3)]
+    public void GetById_WithInvalidId_ThrowsArgumentOutOfrangeArgumentException(int id)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => _service.GetById(id));
+    }
+
+    [Fact]
+    public void GetById_WithNonExistingId_ThrowsKeyNotFoundException()
+    {
+        int nonExistingId = 256;
+
+        Assert.Throws<KeyNotFoundException>(() => _service.GetById(nonExistingId));
+    }
     
 }
