@@ -1,7 +1,11 @@
 ﻿using StorageSystem.Data;
 using StorageSystem.Services;
 
-using StorageContext context = new();
+var options = new DbContextOptionsBuilder<StorageContext>()
+    .UseSqlite("Data Source = storage.db")
+    .Options;
+
+using StorageContext context = new(options);
 
 BrandService brandService = new(context);
 
