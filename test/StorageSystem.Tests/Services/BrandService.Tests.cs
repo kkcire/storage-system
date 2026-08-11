@@ -105,5 +105,29 @@ public class BrandServiceTests
 
         Assert.Throws<KeyNotFoundException>(() => _service.GetById(nonExistingId));
     }
-    
+
+    [Fact]
+    public void SearchByName_WithValidSearch_ReturnsMatchingBrands()
+    {
+        _context.Brands.Add(new Brand { Name = "Fender" });
+        _context.Brands.Add(new Brand { Name = "Gibson" });
+        _context.Brands.Add(new Brand { Name = "Jackson" });
+        _context.SaveChanges();
+
+        List<Brand> result = _service.SearchByName("on");
+
+        Assert.NotNull(result);
+        Assert.Contains(result, b => b.Name == "Jackson");
+        Assert.Contains(result, b => b.Name == "Gibson");
+        Assert.All(result, b => Assert.Contains("on", b.Name));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("  ")]
+    public void SearchByName_WithNullOrEmptyName_ThrowsArgumentException(string searchName)
+    {
+        Assert.Throws<ArgumentException>(() => _service.SearchByName(searchName));
+    }
 }
