@@ -61,6 +61,12 @@ public class BrandServiceTests
         Assert.Throws<KeyNotFoundException>(() => _service.Update(999, "Samsung"));
     }
 
+    [Fact]
+    public void Update_WithInvalidIdAndName_ThrowsArgumentExceptionForNameFirst()
+    {
+        Assert.Throws<ArgumentException>(() => _service.Update(-2, ""));
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData(null)]
@@ -78,9 +84,48 @@ public class BrandServiceTests
     }
 
     [Fact]
+    public void Delete_WithValidId_RemovesBrandFromDatabase()
+    {
+        Brand brand = new() { Name = "Fender" };
+        _context.Brands.Add(brand);
+        _context.SaveChanges();
+
+        _service.Delete(brand.Id);
+
+        Assert.Throws<KeyNotFoundException>(() => _service.GetById(brand.Id));
+    }
+
+    [Fact]
+    public void Delete_WithValidId_ReturnsDeletedBrandName()
+    {
+        Brand brand = new() { Name = "Fender" };
+        _context.Brands.Add(brand);
+        _context.SaveChanges();
+
+        string deletedName = _service.Delete(brand.Id);
+
+        Assert.Equal("Fender", deletedName);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void Delete_WithInvalidId_ThrowsArgumentOutOfRangeException(int invalidId)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => _service.Delete(invalidId));
+    }
+
+    [Fact]
+    public void Delete_WithNonExistingId_ThrowsKeyNotFoundException()
+    {
+        int nonExistingId = 237;
+        
+        Assert.Throws<KeyNotFoundException>(() => _service.Delete(nonExistingId));
+    }
+
+    [Fact]
     public void GetById_WithValidId_ReturnsBrand()
     {
-
         Brand brand = _service.Add("Fender");
         Brand result = _service.GetById(brand.Id);
 
@@ -130,4 +175,26 @@ public class BrandServiceTests
         Assert.Throws<ArgumentException>(() => _service.SearchByName(searchName));
     }
 
+    [Fact]
+    public void GetAll_ReturnsAllBrands()
+    {
+        _context.Brands.Add(new Brand { Name = "Fender" });
+        _context.Brands.Add(new Brand { Name = "Gibson" });
+        _context.Brands.Add(new Brand { Name = "Jackson" });
+        _context.SaveChanges();
+
+        List<Brand> result = _service.GetAll();
+
+        Assert.NotNull(result);
+        Assert.Equal(3, result.Count);
+        Assert.All(result, b => Assert.NotEqual(0, b.Id));
+    }
+
+    [Fact]
+    public void GetAll_WithNoBrands_ReturnsEmptyList()
+    {
+        List<Brand> result = _service.GetAll();
+
+        Assert.Empty(result);
+    }
 }
