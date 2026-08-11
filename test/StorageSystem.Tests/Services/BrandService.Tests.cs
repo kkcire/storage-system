@@ -30,12 +30,11 @@ public class BrandServiceTests
     {
         string name = "Spotify";
 
-        Brand result = _service.Add(name);
-        Brand? brand = _context.Brands.FirstOrDefault(b => b.Name == name);
+        Brand brand = _service.Add(name);
 
         Assert.NotNull(brand);
-        Assert.NotNull(result);
-        Assert.Equal(name, result.Name);
+        Assert.Equal(name, brand.Name);
+        Assert.NotEqual(0, brand.Id);
     }
 
     [Theory]
@@ -130,4 +129,5 @@ public class BrandServiceTests
     {
         Assert.Throws<ArgumentException>(() => _service.SearchByName(searchName));
     }
+
 }
