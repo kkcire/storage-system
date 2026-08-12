@@ -92,12 +92,7 @@ public class ProductService(StorageContext context)
     
     public Product AdjustStockQuantity(int id, int amount)
     {
-        ArgumentNullException.ThrowIfNull(amount);
-
         var product = GetById(id);
-
-        if (product == null)
-            throw new KeyNotFoundException($"The product with ID {id} was not found.");
 
         product.Quantity += amount;
         context.SaveChanges();
