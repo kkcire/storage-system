@@ -10,14 +10,19 @@ public class ProductService(StorageContext context)
         GuardClause.ValidateNullOrEmptyName(name);
         GuardClause.ValidateZeroOrNegativePrice(price);
         GuardClause.ValidateNegativeQuantity(quantity);
+        GuardClause.ValidateZeroOrNegativeId(brandId);
 
         string trimmedName = name.Trim();
         bool productExist = context.Products.Any(p => p.Name == trimmedName);
-        
+        var brand = context.Brands.Find(brandId);
+
+        if (brand == null)
+            throw new KeyNotFoundException($"The brand with ID {brandId} was not found.");
+
         if (productExist)
             throw new InvalidOperationException($"A product with the name {trimmedName} already exist");
 
-        Product product = new() { Name = name, Price = price, Quantity = quantity, BrandId = brandId };
+        Product product = new() { Name = trimmedName, Price = price, Quantity = quantity, BrandId = brandId };
 
         context.Products.Add(product);
         context.SaveChanges();
@@ -89,7 +94,7 @@ public class ProductService(StorageContext context)
     {
         return context.Products.ToList();
     }
-    
+
     public Product AdjustStockQuantity(int id, int amount)
     {
         var product = GetById(id);
