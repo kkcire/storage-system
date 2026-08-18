@@ -324,7 +324,34 @@ public class ProductServiceTests
     public void Delete_WithNonExistingId_ThrowsKeyNotFoundException()
     {
         int nonExistingId = 237;
-        
+
         Assert.Throws<KeyNotFoundException>(() => _service.Delete(nonExistingId));
+    }
+
+    [Fact]
+    public void GetById_WithValidId_ReturnsProduct()
+    {
+        Brand brand = CreateDefaultBrand();
+        Product product = CreateDefaultProduct();
+        Product foundProduct = _service.GetById(product.Id);
+
+        Assert.NotNull(foundProduct);
+        Assert.Equal(product, foundProduct);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-3)]
+    public void GetById_WithInvalidId_ThrowsArgumentOutOfrangeArgumentException(int id)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => _service.GetById(id));
+    }
+
+    [Fact]
+    public void GetById_WithNonExistingId_ThrowsKeyNotFoundException()
+    {
+        int nonExistingId = 256;
+
+        Assert.Throws<KeyNotFoundException>(() => _service.GetById(nonExistingId));
     }
 }
