@@ -26,18 +26,29 @@ public class ProductServiceTests
 
     }
 
+    private Product CreateDefaultProduct(string name = "Processador Ryzen 7 7800X3D", decimal price = 2899.90m, int quantity = 10, int brandId = 1)
+    {
+        return _service.Register(name, price, quantity, brandId);
+    }
+
+    private Brand CreateDefaultBrand(string name = "AMD")
+    {
+        Brand brand = new() { Name = name };
+        _context.Brands.Add(brand);
+        _context.SaveChanges();
+        return brand;
+    }
+
     [Fact]
     public void Register_WithAllValidInputs_ReturnsNewProduct()
     {
-        Brand brand = new() { Name = "AMD" };
-        _context.Brands.Add(brand);
-        _context.SaveChanges();
-
+        
         string name = "Processador Ryzen 7 7800X3D";
         decimal price = 2899.90m;
         int quantity = 10;
         int brandId = 1;
 
+        Brand brand = CreateDefaultBrand();
         Product product = _service.Register(name, price, quantity, brand.Id);
 
         Assert.NotNull(product);
@@ -55,9 +66,7 @@ public class ProductServiceTests
         int quantity = 10;
         int brandId = 1;
 
-        Brand brand = new() { Name = "AMD" };
-        _context.Brands.Add(brand);
-        _context.SaveChanges();
+        Brand brand = CreateDefaultBrand();
 
         Product persistedProduct = _service.Register(name, price, quantity, brand.Id);
 
@@ -68,12 +77,10 @@ public class ProductServiceTests
     [Fact]
     public void Register_WithNameContainingWhitespaces_TrimsName()
     {
-        Brand brand = new() { Name = "AMD" };
-        _context.Brands.Add(brand);
-        _context.SaveChanges();
 
         string whitespacedName = "  Processador Ryzen 7 ";
 
+        Brand brand = CreateDefaultBrand();
         Product product = _service.Register(whitespacedName, 2899.90m, 10, brand.Id);
 
         Assert.Equal("Processador Ryzen 7", product.Name);
@@ -148,11 +155,9 @@ public class ProductServiceTests
         decimal newPrice = 2899.99m;
         int newQuantity = 7;
 
-        Brand brand = new() { Name = "AMD" };
-        _context.Brands.Add(brand);
-        _context.SaveChanges();
+        Brand brand = CreateDefaultBrand();
 
-        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+        Product product = CreateDefaultProduct();
 
         _service.Update(product.Id, newName, newPrice, newQuantity);
 
@@ -169,11 +174,9 @@ public class ProductServiceTests
         decimal newPrice = 2899.99m;
         int newQuantity = 7;
 
-        Brand brand = new() { Name = "AMD" };
-        _context.Brands.Add(brand);
-        _context.SaveChanges();
+        Brand brand = CreateDefaultBrand();
 
-        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+        Product product = CreateDefaultProduct();
 
         _service.Update(id: product.Id, name: newName, quantity: newQuantity);
 
@@ -186,17 +189,15 @@ public class ProductServiceTests
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Update_WithInvalidName_ThrowsArgumentOutOfRangeException(int invalidId)
+    public void Update_WithInvalidId_ThrowsArgumentOutOfRangeException(int invalidId)
     {
         string newName = "Processador Ryzen 7 9700X";
         decimal newPrice = 2899.99m;
         int newQuantity = 7;
 
-        Brand brand = new() { Name = "AMD" };
-        _context.Brands.Add(brand);
-        _context.SaveChanges();
+        Brand brand = CreateDefaultBrand();
 
-        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+        Product product = CreateDefaultProduct();
 
         Assert.Throws<ArgumentOutOfRangeException>(()
             => _service.Update(invalidId, newName, newPrice, newQuantity));
@@ -209,11 +210,9 @@ public class ProductServiceTests
         decimal newPrice = 2899.99m;
         int newQuantity = 7;
 
-        Brand brand = new() { Name = "AMD" };
-        _context.Brands.Add(brand);
-        _context.SaveChanges();
+        Brand brand = CreateDefaultBrand();
 
-        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+        Product product = CreateDefaultProduct();
 
         Assert.Throws<ArgumentException>(()
             => _service.Update(product.Id, invalidName, newPrice, newQuantity));
@@ -228,11 +227,9 @@ public class ProductServiceTests
         string newName = "Processador Ryzen 7 9700X";
         int newQuantity = 7;
 
-        Brand brand = new() { Name = "AMD" };
-        _context.Brands.Add(brand);
-        _context.SaveChanges();
+        Brand brand = CreateDefaultBrand();
 
-        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+        Product product = CreateDefaultProduct();
 
         Assert.Throws<ArgumentOutOfRangeException>(()
             => _service.Update(product.Id, newName, invalidPrice, newQuantity));
@@ -246,11 +243,9 @@ public class ProductServiceTests
         string newName = "Processador Ryzen 7 9700X";
         decimal newPrice = 2899.99m;
 
-        Brand brand = new() { Name = "AMD" };
-        _context.Brands.Add(brand);
-        _context.SaveChanges();
+        Brand brand = CreateDefaultBrand();
 
-        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+        Product product = CreateDefaultProduct();
 
         Assert.Throws<ArgumentOutOfRangeException>(()
             => _service.Update(product.Id, newName, newPrice, invalidQuantity));
@@ -265,11 +260,9 @@ public class ProductServiceTests
         decimal newPrice = 2899.99m;
         int newQuantity = 7;
 
-        Brand brand = new() { Name = "AMD" };
-        _context.Brands.Add(brand);
-        _context.SaveChanges();
+        Brand brand = CreateDefaultBrand();
 
-        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+        Product product = CreateDefaultProduct();
 
         Assert.Throws<KeyNotFoundException>(()
             => _service.Update(nonExistingId, newName, newPrice, newQuantity));
@@ -277,17 +270,15 @@ public class ProductServiceTests
     }
 
     [Fact]
-    public void Update_WithSameNameOfOuterProduct_ThrowsInvalidOperationException()
+    public void Update_WithExistingNameOfOtherProduct_ThrowsInvalidOperationException()
     {
         string newName = "Processador Ryzen 7 9700X";
 
-        Brand brand = new() { Name = "AMD" };
-        _context.Brands.Add(brand);
-        _context.SaveChanges();
+        Brand brand = CreateDefaultBrand();
 
-        Product existingProduct = _service.Register("Processador Ryzen 7 9700X", 2899.99m, 7, brand.Id);
+        Product existingProduct = CreateDefaultProduct("Processador Ryzen 7 9700X", 2899.99m, 7, brand.Id);
 
-        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+        Product product = CreateDefaultProduct();
 
         Assert.Throws<InvalidOperationException>(()
             => _service.Update(id: product.Id, name: newName));
