@@ -284,4 +284,47 @@ public class ProductServiceTests
             => _service.Update(id: product.Id, name: newName));
 
     }
+
+    [Fact]
+    public void Delete_WithValidId_RemovesProductFromDatabase()
+    {
+        Brand brand = CreateDefaultBrand();
+        Product product = CreateDefaultProduct();
+
+        _service.Delete(product.Id);
+
+        Assert.Throws<KeyNotFoundException>(()
+            => _service.GetById(product.Id));
+    }
+
+    [Fact]
+    public void Delete_WithValidId_ReturnsDeletedProductInformations()
+    {
+        Brand brand = CreateDefaultBrand();
+        Product product = CreateDefaultProduct();
+
+        Product deletedProduct = _service.Delete(product.Id);
+
+        Assert.Equal(product.Id, deletedProduct.Id);
+        Assert.Equal(product.Name, deletedProduct.Name);
+        Assert.Equal(product.Price, deletedProduct.Price);
+        Assert.Equal(product.Quantity, deletedProduct.Quantity);
+        Assert.Equal(product.BrandId, deletedProduct.BrandId);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void Delete_WithInvalidId_ThrowsArgumentOutOfRangeException(int invalidId)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => _service.Delete(invalidId));
+    }
+
+    [Fact]
+    public void Delete_WithNonExistingId_ThrowsKeyNotFoundException()
+    {
+        int nonExistingId = 237;
+        
+        Assert.Throws<KeyNotFoundException>(() => _service.Delete(nonExistingId));
+    }
 }
