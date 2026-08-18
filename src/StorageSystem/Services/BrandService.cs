@@ -7,7 +7,7 @@ public class BrandService(StorageContext context)
 {
     public Brand Add(string name)
     {
-        GuardClause.ValidateNullOrEmptyName(name);
+        GuardClause.AgainstNullOrEmptyName(name);
 
         Brand brand = new() { Name = name };
         context.Brands.Add(brand);
@@ -17,7 +17,7 @@ public class BrandService(StorageContext context)
 
     public Brand Update(int id, string newName)
     {
-        GuardClause.ValidateNullOrEmptyName(newName);
+        GuardClause.AgainstNullOrEmptyName(newName);
 
         var brand = GetById(id);
 
@@ -39,7 +39,7 @@ public class BrandService(StorageContext context)
 
     public Brand GetById(int id)
     {
-        GuardClause.ValidateZeroOrNegativeId(id);
+        GuardClause.AgainstZeroOrNegativeId(id);
 
         var brand = context.Brands.Find(id);
 
@@ -51,7 +51,7 @@ public class BrandService(StorageContext context)
 
     public List<Brand> SearchByName(string name)
     {
-        GuardClause.ValidateNullOrEmptyName(name);
+        GuardClause.AgainstNullOrEmptyName(name);
 
         return context.Brands.Where(b => b.Name.Contains(name)).ToList();
     }

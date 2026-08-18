@@ -7,10 +7,10 @@ public class ProductService(StorageContext context)
 {
     public Product Register(string name, decimal price, int quantity, int brandId)
     {
-        GuardClause.ValidateNullOrEmptyName(name);
-        GuardClause.ValidateZeroOrNegativePrice(price);
-        GuardClause.ValidateNegativeQuantity(quantity);
-        GuardClause.ValidateZeroOrNegativeId(brandId);
+        GuardClause.AgainstNullOrEmptyName(name);
+        GuardClause.AgainstZeroOrNegativePrice(price);
+        GuardClause.AgainstNegativeQuantity(quantity);
+        GuardClause.AgainstZeroOrNegativeId(brandId);
 
         string trimmedName = name.Trim();
         bool productExist = context.Products.Any(p => p.Name == trimmedName);
@@ -35,7 +35,7 @@ public class ProductService(StorageContext context)
 
         if (name is not null)
         {
-            GuardClause.ValidateNullOrEmptyName(name);
+            GuardClause.AgainstNullOrEmptyName(name);
 
             string trimmedName = name.Trim();
 
@@ -46,18 +46,18 @@ public class ProductService(StorageContext context)
 
             product.Name = trimmedName;
         }
-        
+
 
         if (price is not null)
         {
-            GuardClause.ValidateZeroOrNegativePrice(price.Value);
+            GuardClause.AgainstZeroOrNegativePrice(price.Value);
 
             product.Price = price.Value;
         }
 
         if (quantity is not null)
         {
-            GuardClause.ValidateNegativeQuantity(quantity.Value);
+            GuardClause.AgainstNegativeQuantity(quantity.Value);
 
             product.Quantity = quantity.Value;
         }
@@ -79,7 +79,7 @@ public class ProductService(StorageContext context)
 
     public Product GetById(int id)
     {
-        GuardClause.ValidateZeroOrNegativeId(id);
+        GuardClause.AgainstZeroOrNegativeId(id);
 
         var product = context.Products.Find(id);
 
@@ -91,7 +91,7 @@ public class ProductService(StorageContext context)
 
     public List<Product> SearchByName(string name)
     {
-        GuardClause.ValidateNullOrEmptyName(name);
+        GuardClause.AgainstNullOrEmptyName(name);
 
         return context.Products.Where(p => p.Name.Contains(name)).ToList();
     }
