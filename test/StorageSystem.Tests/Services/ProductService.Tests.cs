@@ -61,7 +61,8 @@ public class ProductServiceTests
 
         Product persistedProduct = _service.Register(name, price, quantity, brand.Id);
 
-        Assert.Throws<InvalidOperationException>(() => _service.Register(name, price, quantity, brandId));
+        Assert.Throws<InvalidOperationException>(()
+            => _service.Register(name, price, quantity, brandId));
     }
 
     [Fact]
@@ -140,4 +141,138 @@ public class ProductServiceTests
             brandId: nonExistingId));
     }
 
+    [Fact]
+    public void Update_WithAllValidInputs_UpdatesProduct()
+    {
+        string newName = "Processador Ryzen 7 9700X";
+        decimal newPrice = 2899.99m;
+        int newQuantity = 7;
+
+        Brand brand = new() { Name = "AMD" };
+        _context.Brands.Add(brand);
+        _context.SaveChanges();
+
+        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+
+        _service.Update(product.Id, newName, newPrice, newQuantity);
+
+        Assert.NotNull(product);
+        Assert.Equal(newName, product.Name);
+        Assert.Equal(newPrice, product.Price);
+        Assert.Equal(newQuantity, product.Quantity);
+    }
+
+    [Fact]
+    public void Update_WithNotAllValidInputs_UpdatesOnlySelectedInputs()
+    {
+        string newName = "Processador Ryzen 7 9700X";
+        decimal newPrice = 2899.99m;
+        int newQuantity = 7;
+
+        Brand brand = new() { Name = "AMD" };
+        _context.Brands.Add(brand);
+        _context.SaveChanges();
+
+        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+
+        _service.Update(id: product.Id, name: newName, quantity: newQuantity);
+
+        Assert.NotNull(product);
+        Assert.Equal(newName, product.Name);
+        Assert.NotEqual(newPrice, product.Price);
+        Assert.Equal(newQuantity, product.Quantity);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void Update_WithInvalidName_ThrowsArgumentOutOfRangeException(int invalidId)
+    {
+        string newName = "Processador Ryzen 7 9700X";
+        decimal newPrice = 2899.99m;
+        int newQuantity = 7;
+
+        Brand brand = new() { Name = "AMD" };
+        _context.Brands.Add(brand);
+        _context.SaveChanges();
+
+        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+
+        Assert.Throws<ArgumentOutOfRangeException>(()
+            => _service.Update(invalidId, newName, newPrice, newQuantity));
+    }
+
+    [Theory]
+    [InlineData("")]
+    public void Update_WithInvalidName_ThrowsArgumentException(string invalidName)
+    {
+        decimal newPrice = 2899.99m;
+        int newQuantity = 7;
+
+        Brand brand = new() { Name = "AMD" };
+        _context.Brands.Add(brand);
+        _context.SaveChanges();
+
+        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+
+        Assert.Throws<ArgumentException>(()
+            => _service.Update(product.Id, invalidName, newPrice, newQuantity));
+
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void Update_WithInvalidPrice_ThrowsArgumentOutOfRangeException(decimal invalidPrice)
+    {
+        string newName = "Processador Ryzen 7 9700X";
+        int newQuantity = 7;
+
+        Brand brand = new() { Name = "AMD" };
+        _context.Brands.Add(brand);
+        _context.SaveChanges();
+
+        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+
+        Assert.Throws<ArgumentOutOfRangeException>(()
+            => _service.Update(product.Id, newName, invalidPrice, newQuantity));
+
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    public void Update_WithInvalidQuantity_ThrowsArgumentOutOfRangeException(int invalidQuantity)
+    {
+        string newName = "Processador Ryzen 7 9700X";
+        decimal newPrice = 2899.99m;
+
+        Brand brand = new() { Name = "AMD" };
+        _context.Brands.Add(brand);
+        _context.SaveChanges();
+
+        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+
+        Assert.Throws<ArgumentOutOfRangeException>(()
+            => _service.Update(product.Id, newName, newPrice, invalidQuantity));
+
+    }
+
+    [Fact]
+    public void Update_WithNonExistingProductId_ThrowsKeyNotFoundException()
+    {
+        int nonExistingId = 237;
+        string newName = "Processador Ryzen 7 9700X";
+        decimal newPrice = 2899.99m;
+        int newQuantity = 7;
+
+        Brand brand = new() { Name = "AMD" };
+        _context.Brands.Add(brand);
+        _context.SaveChanges();
+
+        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+
+        Assert.Throws<KeyNotFoundException>(() 
+            => _service.Update(nonExistingId, newName, newPrice, newQuantity));
+
+    }
 }
