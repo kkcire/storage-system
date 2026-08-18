@@ -271,8 +271,26 @@ public class ProductServiceTests
 
         Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
 
-        Assert.Throws<KeyNotFoundException>(() 
+        Assert.Throws<KeyNotFoundException>(()
             => _service.Update(nonExistingId, newName, newPrice, newQuantity));
+
+    }
+
+    [Fact]
+    public void Update_WithSameNameOfOuterProduct_ThrowsInvalidOperationException()
+    {
+        string newName = "Processador Ryzen 7 9700X";
+
+        Brand brand = new() { Name = "AMD" };
+        _context.Brands.Add(brand);
+        _context.SaveChanges();
+
+        Product existingProduct = _service.Register("Processador Ryzen 7 9700X", 2899.99m, 7, brand.Id);
+
+        Product product = _service.Register("Processador Ryzen 7 7800X3D", 2899.90m, 10, brand.Id);
+
+        Assert.Throws<InvalidOperationException>(()
+            => _service.Update(id: product.Id, name: newName));
 
     }
 }
