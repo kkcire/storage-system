@@ -31,16 +31,22 @@ public class ProductService(StorageContext context)
 
     public Product Update(int id, string? name = null, decimal? price = null, int? quantity = null)
     {
-        GuardClause.ValidateZeroOrNegativeId(id);
-
         var product = GetById(id);
 
         if (name is not null)
         {
             GuardClause.ValidateNullOrEmptyName(name);
 
-            product.Name = name.Trim();
+            string trimmedName = name.Trim();
+
+            bool identicalProductExist = context.Products.Any(p => p.Name == trimmedName && p.Id != id);
+
+            if (identicalProductExist)
+                throw new InvalidOperationException($"A product with the name {trimmedName} already exists");
+
+            product.Name = trimmedName;
         }
+        
 
         if (price is not null)
         {
@@ -98,6 +104,9 @@ public class ProductService(StorageContext context)
     public Product AdjustStockQuantity(int id, int amount)
     {
         var product = GetById(id);
+
+        if (amount + product.Quantity < 0)
+            throw new InvalidOperationException("The value cannot leaves the stock negative");
 
         product.Quantity += amount;
         context.SaveChanges();
