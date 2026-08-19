@@ -53,7 +53,9 @@ public class BrandService(StorageContext context)
     {
         GuardClause.AgainstNullOrEmptyName(name);
 
-        return context.Brands.Where(b => b.Name.Contains(name)).ToList();
+        return context.Brands
+            .Where(b => b.Name.ToLower().Contains(name.ToLower()))
+            .ToList();
     }
 
     public List<Brand> GetAll()
