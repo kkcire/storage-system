@@ -93,7 +93,9 @@ public class ProductService(StorageContext context)
     {
         GuardClause.AgainstNullOrEmptyName(name);
 
-        return context.Products.Where(p => p.Name.Contains(name)).ToList();
+        return context.Products
+            .Where(p => p.Name.ToLower().Contains(name.ToLower()))
+            .ToList();
     }
 
     public List<Product> GetAll()
