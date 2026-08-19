@@ -354,4 +354,67 @@ public class ProductServiceTests
 
         Assert.Throws<KeyNotFoundException>(() => _service.GetById(nonExistingId));
     }
+
+    [Fact]
+    public void SearchByName_WithValidSearch_ReturnsMatchingProducts()
+    {
+        Brand amdBrand = CreateDefaultBrand("AMD");
+        Brand intelBrand = CreateDefaultBrand("Intel");
+
+        Product ryzenProduct9700 = CreateDefaultProduct(name: "Processador Ryzen 7 9700X", brandId: amdBrand.Id);
+        Product ryzenProduct5600 = CreateDefaultProduct(name: "Processador Ryzen 5 5600", brandId: amdBrand.Id);
+        Product intelProduct = CreateDefaultProduct(name: "Processador Intel Core i7-14700K", brandId: intelBrand.Id);
+
+        List<Product> foundMatchingProducts = _service.SearchByName("zen");
+
+        Assert.NotNull(foundMatchingProducts);
+        Assert.Contains(foundMatchingProducts, p => p.Name == "Processador Ryzen 7 9700X");
+        Assert.Contains(foundMatchingProducts, p => p.Name == "Processador Ryzen 5 5600");
+        Assert.All(foundMatchingProducts, p => Assert.Contains("zen", p.Name));
+    }
+
+    [Fact]
+    public void SearchByName_IsCaseSensitive_ReturnsMatchingProducts()
+    {
+        Brand amdBrand = CreateDefaultBrand("AMD");
+        Product ryzenProduct9700 = CreateDefaultProduct(name: "Processador Ryzen 7 9700X", brandId: amdBrand.Id);
+
+        List<Product> foundMatchingProducts = _service.SearchByName("ryzen");
+
+        Assert.Contains(foundMatchingProducts, p => p.Name == "Processador Ryzen 7 9700X");
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("  ")]
+    public void SearchByName_WithNullOrEmptyName_ThrowsArgumentException(string searchName)
+    {
+        Assert.Throws<ArgumentException>(() => _service.SearchByName(searchName));
+    }
+
+    [Fact]
+    public void GetAll_ReturnsAllProducts()
+    {
+        Brand amdBrand = CreateDefaultBrand("AMD");
+        Brand intelBrand = CreateDefaultBrand("Intel");
+
+        Product ryzenProduct9700 = CreateDefaultProduct(name: "Processador Ryzen 7 9700X", brandId: amdBrand.Id);
+        Product ryzenProduct5600 = CreateDefaultProduct(name: "Processador Ryzen 5 5600", brandId: amdBrand.Id);
+        Product intelProduct = CreateDefaultProduct(name: "Processador Intel Core i7-14700K", brandId: intelBrand.Id);
+
+        List<Product> products = _service.GetAll();
+
+        Assert.NotNull(products);
+        Assert.Equal(3, products.Count);
+        Assert.All(products, p => Assert.NotEqual(0, p.Id));
+    }
+
+    [Fact]
+    public void GetAll_WithNoProducts_ReturnsEmptyList()
+    {
+        List<Product> products = _service.GetAll();
+
+        Assert.Empty(products);
+    }
 }
