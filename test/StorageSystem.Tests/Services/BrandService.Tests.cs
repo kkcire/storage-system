@@ -166,6 +166,17 @@ public class BrandServiceTests
         Assert.All(result, b => Assert.Contains("on", b.Name));
     }
 
+    [Fact]
+    public void SearchByName_IsCaseInsensitive_ReturnsMatchingProducts()
+    {
+        _context.Brands.Add(new Brand { Name = "AMD" });
+        _context.SaveChanges();
+
+        List<Brand> foundMatchingProducts = _service.SearchByName("AM");
+
+        Assert.Contains(foundMatchingProducts, p => p.Name == "AMD");
+    }
+
     [Theory]
     [InlineData(null)]
     [InlineData("")]
