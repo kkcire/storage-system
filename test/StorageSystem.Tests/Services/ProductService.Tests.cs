@@ -374,7 +374,7 @@ public class ProductServiceTests
     }
 
     [Fact]
-    public void SearchByName_IsCaseSensitive_ReturnsMatchingProducts()
+    public void SearchByName_IsCaseInsensitive_ReturnsMatchingProducts()
     {
         Brand amdBrand = CreateDefaultBrand("AMD");
         Product ryzenProduct9700 = CreateDefaultProduct(name: "Processador Ryzen 7 9700X", brandId: amdBrand.Id);
