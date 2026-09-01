@@ -5,7 +5,7 @@ namespace StorageSystem.Services;
 
 public class BrandService(StorageContext context)
 {
-    public Brand Add(string name)
+    public Brand Register(string name)
     {
         GuardClause.ValidateNullOrEmptyName(name);
 
