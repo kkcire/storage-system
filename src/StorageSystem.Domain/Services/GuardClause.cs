@@ -1,7 +1,7 @@
-using StorageSystem.Data;
-using StorageSystem.Entities;
+using StorageSystem.Domain.Data;
+using StorageSystem.Domain.Entities;
 
-namespace StorageSystem.Services;
+namespace StorageSystem.Domain.Services;
 
 public static class GuardClause
 {

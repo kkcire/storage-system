@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\StorageSystem\StorageSystem.csproj" />
+    <ProjectReference Include="..\..\src\StorageSystem.Domain\StorageSystem.Domain.csproj" />
   </ItemGroup>
 
 </Project>

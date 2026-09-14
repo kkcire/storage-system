@@ -1,5 +1,5 @@
-using StorageSystem.Services;
-using StorageSystem.Entities;
+using StorageSystem.Domain.Services;
+using StorageSystem.Domain.Entities;
 using Spectre.Console;
 
 namespace StorageSystem.UI;

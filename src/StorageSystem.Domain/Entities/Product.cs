@@ -1,4 +1,4 @@
-namespace StorageSystem.Entities;
+namespace StorageSystem.Domain.Entities;
 
 public class Product
 {

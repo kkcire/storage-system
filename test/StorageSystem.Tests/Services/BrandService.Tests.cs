@@ -1,7 +1,7 @@
 using Microsoft.Data.Sqlite;
-using StorageSystem.Data;
-using StorageSystem.Entities;
-using StorageSystem.Services;
+using StorageSystem.Domain.Data;
+using StorageSystem.Domain.Entities;
+using StorageSystem.Domain.Services;
 
 namespace StorageSystem.Tests.Services;
 
@@ -119,7 +119,7 @@ public class BrandServiceTests
     public void Delete_WithNonExistingId_ThrowsKeyNotFoundException()
     {
         int nonExistingId = 237;
-        
+
         Assert.Throws<KeyNotFoundException>(() => _service.Delete(nonExistingId));
     }
 

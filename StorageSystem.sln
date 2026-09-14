@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0CC2AAC2-B00B-41BF-92E8-2106B04852E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageSystem", "src\StorageSystem\StorageSystem.csproj", "{AE925D04-1B7B-4EF8-AEBB-E0EDA51929ED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageSystem.Domain", "src\StorageSystem.Domain\StorageSystem.Domain.csproj", "{AE925D04-1B7B-4EF8-AEBB-E0EDA51929ED}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{23B343EF-ED2A-42FA-A459-7E1E26A6B6C5}"
 EndProject
@@ -16,9 +16,6 @@ Global
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{AE925D04-1B7B-4EF8-AEBB-E0EDA51929ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AE925D04-1B7B-4EF8-AEBB-E0EDA51929ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -28,6 +25,9 @@ Global
 		{612816D3-EA3D-4EFF-95FC-B2B5BFFDFA26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{612816D3-EA3D-4EFF-95FC-B2B5BFFDFA26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{612816D3-EA3D-4EFF-95FC-B2B5BFFDFA26}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AE925D04-1B7B-4EF8-AEBB-E0EDA51929ED} = {0CC2AAC2-B00B-41BF-92E8-2106B04852E7}

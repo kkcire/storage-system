@@ -1,6 +1,6 @@
-﻿using StorageSystem.Data;
-using StorageSystem.Entities;
-using StorageSystem.Services;
+﻿using StorageSystem.Domain.Data;
+using StorageSystem.Domain.Entities;
+using StorageSystem.Domain.Services;
 using StorageSystem.UI;
 
 var options = new DbContextOptionsBuilder<StorageContext>()
