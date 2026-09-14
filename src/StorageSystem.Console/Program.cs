@@ -1,10 +1,14 @@
 ﻿using StorageSystem.Domain.Data;
 using StorageSystem.Domain.Entities;
 using StorageSystem.Domain.Services;
-using StorageSystem.UI;
+using Microsoft.EntityFrameworkCore;
+using StorageSystem.Console.UI;
+
+var dbPath = Environment.GetEnvironmentVariable("STORAGE_DB_PATH")
+    ?? Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "storage.db");
 
 var options = new DbContextOptionsBuilder<StorageContext>()
-    .UseSqlite("Data Source = storage.db")
+    .UseSqlite($"Data Source={dbPath}")
     .Options;
 
 StorageContext context = new(options);

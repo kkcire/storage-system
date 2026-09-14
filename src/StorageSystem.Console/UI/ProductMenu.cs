@@ -2,7 +2,7 @@ using StorageSystem.Domain.Services;
 using StorageSystem.Domain.Entities;
 using Spectre.Console;
 
-namespace StorageSystem.UI;
+namespace StorageSystem.Console.UI;
 
 public class ProductMenu(ProductService productService)
 {

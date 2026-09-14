@@ -1,6 +1,6 @@
 using Spectre.Console;
 
-namespace StorageSystem.UI;
+namespace StorageSystem.Console.UI;
 
 public class Menu(BrandMenu brandMenu, ProductMenu productMenu)
 {

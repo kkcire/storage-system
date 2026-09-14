@@ -2,7 +2,7 @@ using Spectre.Console;
 using StorageSystem.Domain.Services;
 using StorageSystem.Domain.Entities;
 
-namespace StorageSystem.UI;
+namespace StorageSystem.Console.UI;
 
 public class BrandMenu(BrandService brandService)
 {
