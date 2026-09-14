@@ -1,24 +1,20 @@
 ﻿using StorageSystem.Data;
+using StorageSystem.Entities;
 using StorageSystem.Services;
+using StorageSystem.UI;
 
 var options = new DbContextOptionsBuilder<StorageContext>()
     .UseSqlite("Data Source = storage.db")
     .Options;
 
-using StorageContext context = new(options);
+StorageContext context = new(options);
 
 BrandService brandService = new(context);
+BrandMenu brandMenu = new(brandService);
 
-var brands = brandService.GetAll();
+ProductService productService = new(context);
+ProductMenu productMenu = new(productService);
 
-if (!brands.Any())
-{
-    Console.WriteLine("Nenhuma marca encontrada no banco de dados.");
-}
-else
-{
-    foreach (var brand in brands)
-    {
-        Console.WriteLine($"ID: {brand.Id} | Nome: {brand.Name}");
-    }
-}
+Menu menu = new(brandMenu, productMenu);
+
+menu.Run();

@@ -26,11 +26,11 @@ public class BrandServiceTests
     }
 
     [Fact]
-    public void Add_WithValidName_ReturnsNewBrand()
+    public void Register_WithValidName_ReturnsNewBrand()
     {
         string name = "Spotify";
 
-        Brand brand = _service.Add(name);
+        Brand brand = _service.Register(name);
 
         Assert.NotNull(brand);
         Assert.Equal(name, brand.Name);
@@ -40,15 +40,15 @@ public class BrandServiceTests
     [Theory]
     [InlineData("")]
     [InlineData(null)]
-    public void Add_WithInvalidName_ThrowsArgumentException(string invalidName)
+    public void Register_WithInvalidName_ThrowsArgumentException(string invalidName)
     {
-        Assert.Throws<ArgumentException>(() => _service.Add(invalidName));
+        Assert.Throws<ArgumentException>(() => _service.Register(invalidName));
     }
 
     [Fact]
     public void Update_WithValidIdAndName_UpdatesBrand()
     {
-        Brand brand = _service.Add("Old Name");
+        Brand brand = _service.Register("Old Name");
 
         Brand result = _service.Update(brand.Id, "New Name");
 
@@ -126,7 +126,7 @@ public class BrandServiceTests
     [Fact]
     public void GetById_WithValidId_ReturnsBrand()
     {
-        Brand brand = _service.Add("Fender");
+        Brand brand = _service.Register("Fender");
         Brand result = _service.GetById(brand.Id);
 
         Assert.NotNull(result);

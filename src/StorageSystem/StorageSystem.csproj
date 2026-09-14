@@ -9,8 +9,8 @@
 
   <ItemGroup>
     <Using Include="System.Console" Static="true" />
-    <Using Include="System.Linq"/>
-    <Using Include="Microsoft.EntityFrameworkCore"/>
+    <Using Include="System.Linq" />
+    <Using Include="Microsoft.EntityFrameworkCore" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +19,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
+    <PackageReference Include="Spectre.Console" Version="0.57.2" />
   </ItemGroup>
 
 
