@@ -90,10 +90,10 @@ public class ProductServiceTests
     [InlineData("")]
     [InlineData(null)]
     [InlineData("  ")]
-    public void Register_WithInvalidName_ThrowsArgumentException(string invalidName)
+    public void Register_WithInvalidName_ThrowsArgumentException(string? invalidName)
     {
         Assert.Throws<ArgumentException>(() => _service.Register(
-            name: invalidName,
+            name: invalidName!,
             price: 2899.90m,
             quantity: 10,
             brandId: 1));
@@ -205,7 +205,8 @@ public class ProductServiceTests
 
     [Theory]
     [InlineData("")]
-    public void Update_WithInvalidName_ThrowsArgumentException(string invalidName)
+    [InlineData(null)]
+    public void Update_WithInvalidName_ThrowsArgumentException(string? invalidName)
     {
         decimal newPrice = 2899.99m;
         int newQuantity = 7;
@@ -215,7 +216,7 @@ public class ProductServiceTests
         Product product = CreateDefaultProduct();
 
         Assert.Throws<ArgumentException>(()
-            => _service.Update(product.Id, invalidName, newPrice, newQuantity));
+            => _service.Update(product.Id, invalidName!, newPrice, newQuantity));
 
     }
 
@@ -388,9 +389,9 @@ public class ProductServiceTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("  ")]
-    public void SearchByName_WithNullOrEmptyName_ThrowsArgumentException(string searchName)
+    public void SearchByName_WithNullOrEmptyName_ThrowsArgumentException(string? searchName)
     {
-        Assert.Throws<ArgumentException>(() => _service.SearchByName(searchName));
+        Assert.Throws<ArgumentException>(() => _service.SearchByName(searchName!));
     }
 
     [Fact]

@@ -40,9 +40,9 @@ public class BrandServiceTests
     [Theory]
     [InlineData("")]
     [InlineData(null)]
-    public void Register_WithInvalidName_ThrowsArgumentException(string invalidName)
+    public void Register_WithInvalidName_ThrowsArgumentException(string? invalidName)
     {
-        Assert.Throws<ArgumentException>(() => _service.Register(invalidName));
+        Assert.Throws<ArgumentException>(() => _service.Register(invalidName!));
     }
 
     [Fact]
@@ -70,9 +70,9 @@ public class BrandServiceTests
     [Theory]
     [InlineData("")]
     [InlineData(null)]
-    public void Update_WithInvalidName_ThrowsArgumentException(string invalidName)
+    public void Update_WithInvalidName_ThrowsArgumentException(string? invalidName)
     {
-        Assert.Throws<ArgumentException>(() => _service.Update(1, invalidName));
+        Assert.Throws<ArgumentException>(() => _service.Update(1, invalidName!));
     }
 
     [Theory]
@@ -181,9 +181,9 @@ public class BrandServiceTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("  ")]
-    public void SearchByName_WithNullOrEmptyName_ThrowsArgumentException(string searchName)
+    public void SearchByName_WithNullOrEmptyName_ThrowsArgumentException(string? searchName)
     {
-        Assert.Throws<ArgumentException>(() => _service.SearchByName(searchName));
+        Assert.Throws<ArgumentException>(() => _service.SearchByName(searchName!));
     }
 
     [Fact]
