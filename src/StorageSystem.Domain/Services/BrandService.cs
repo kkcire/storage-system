@@ -5,43 +5,43 @@ namespace StorageSystem.Domain.Services;
 
 public class BrandService(StorageContext context)
 {
-    public Brand Register(string name)
+    public async Task<Brand> Register(string name)
     {
         GuardClause.AgainstNullOrEmptyName(name);
 
         Brand brand = new() { Name = name };
         context.Brands.Add(brand);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
         return brand;
     }
 
-    public Brand Update(int id, string newName)
+    public async Task<Brand> Update(int id, string newName)
     {
         GuardClause.AgainstNullOrEmptyName(newName);
 
-        var brand = GetById(id);
+        var brand = await GetById(id);
 
         brand.Name = newName;
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         return brand;
     }
 
-    public string Delete(int id)
+    public async Task<string> Delete(int id)
     {
-        var brand = GetById(id);
+        var brand = await GetById(id);
 
         context.Brands.Remove(brand);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         return brand.Name;
     }
 
-    public Brand GetById(int id)
+    public async Task<Brand> GetById(int id)
     {
         GuardClause.AgainstZeroOrNegativeId(id);
 
-        var brand = context.Brands.Find(id);
+        var brand = await context.Brands.FindAsync(id);
 
         if (brand == null)
             throw new KeyNotFoundException($"The brand with ID {id} was not found.");
@@ -49,17 +49,17 @@ public class BrandService(StorageContext context)
         return brand;
     }
 
-    public List<Brand> SearchByName(string name)
+    public async Task<List<Brand>> SearchByName(string name)
     {
         GuardClause.AgainstNullOrEmptyName(name);
 
-        return context.Brands
+        return await context.Brands
             .Where(b => b.Name.ToLower().Contains(name.ToLower()))
-            .ToList();
+            .ToListAsync();
     }
 
-    public List<Brand> GetAll()
+    public async Task<List<Brand>> GetAll()
     {
-        return context.Brands.ToList();
+        return await context.Brands.ToListAsync();
     }
 }
