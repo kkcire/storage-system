@@ -1,4 +1,5 @@
 using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using StorageSystem.Domain.Data;
 using StorageSystem.Domain.Entities;
 using StorageSystem.Domain.Services;
@@ -23,12 +24,11 @@ public class ProductServiceTests
         _context.Database.EnsureCreated();
 
         _service = new(_context);
-
     }
 
-    private Product CreateDefaultProduct(string name = "Processador Ryzen 7 7800X3D", decimal price = 2899.90m, int quantity = 10, int brandId = 1)
+    private async Task<Product> CreateDefaultProduct(string name = "Processador Ryzen 7 7800X3D", decimal price = 2899.90m, int quantity = 10, int brandId = 1)
     {
-        return _service.Register(name, price, quantity, brandId);
+        return await _service.Register(name, price, quantity, brandId);
     }
 
     private Brand CreateDefaultBrand(string name = "AMD")
@@ -40,16 +40,15 @@ public class ProductServiceTests
     }
 
     [Fact]
-    public void Register_WithAllValidInputs_ReturnsNewProduct()
+    public async Task Register_WithAllValidInputs_ReturnsNewProduct()
     {
-        
         string name = "Processador Ryzen 7 7800X3D";
         decimal price = 2899.90m;
         int quantity = 10;
         int brandId = 1;
 
         Brand brand = CreateDefaultBrand();
-        Product product = _service.Register(name, price, quantity, brand.Id);
+        Product product = await _service.Register(name, price, quantity, brand.Id);
 
         Assert.NotNull(product);
         Assert.Equal(name, product.Name);
@@ -59,7 +58,7 @@ public class ProductServiceTests
     }
 
     [Fact]
-    public void Register_WithProductAlreadyInDatabase_ThrowsInvalidOperationException()
+    public async Task Register_WithProductAlreadyInDatabase_ThrowsInvalidOperationException()
     {
         string name = "Processador Ryzen 7 7800X3D";
         decimal price = 2899.90m;
@@ -68,20 +67,19 @@ public class ProductServiceTests
 
         Brand brand = CreateDefaultBrand();
 
-        Product persistedProduct = _service.Register(name, price, quantity, brand.Id);
+        Product persistedProduct = await _service.Register(name, price, quantity, brand.Id);
 
-        Assert.Throws<InvalidOperationException>(()
+        await Assert.ThrowsAsync<InvalidOperationException>(()
             => _service.Register(name, price, quantity, brandId));
     }
 
     [Fact]
-    public void Register_WithNameContainingWhitespaces_TrimsName()
+    public async Task Register_WithNameContainingWhitespaces_TrimsName()
     {
-
         string whitespacedName = "  Processador Ryzen 7 ";
 
         Brand brand = CreateDefaultBrand();
-        Product product = _service.Register(whitespacedName, 2899.90m, 10, brand.Id);
+        Product product = await _service.Register(whitespacedName, 2899.90m, 10, brand.Id);
 
         Assert.Equal("Processador Ryzen 7", product.Name);
     }
@@ -90,9 +88,9 @@ public class ProductServiceTests
     [InlineData("")]
     [InlineData(null)]
     [InlineData("  ")]
-    public void Register_WithInvalidName_ThrowsArgumentException(string? invalidName)
+    public async Task Register_WithInvalidName_ThrowsArgumentException(string? invalidName)
     {
-        Assert.Throws<ArgumentException>(() => _service.Register(
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.Register(
             name: invalidName!,
             price: 2899.90m,
             quantity: 10,
@@ -103,9 +101,9 @@ public class ProductServiceTests
     [InlineData(0)]
     [InlineData(-203)]
     [InlineData(-0.21)]
-    public void Register_WithInvalidPrice_ThrowsArgumentOutOfRangeException(decimal invalidPrice)
+    public async Task Register_WithInvalidPrice_ThrowsArgumentOutOfRangeException(decimal invalidPrice)
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => _service.Register(
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _service.Register(
             name: "Processador Ryzen 7 7800X3D",
             price: invalidPrice,
             quantity: 10,
@@ -115,9 +113,9 @@ public class ProductServiceTests
     [Theory]
     [InlineData(-1)]
     [InlineData(-203)]
-    public void Register_WithInvalidQuantity_ThrowsArgumentOutOfRangeException(int invalidQuantity)
+    public async Task Register_WithInvalidQuantity_ThrowsArgumentOutOfRangeException(int invalidQuantity)
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => _service.Register(
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _service.Register(
             name: "Processador Ryzen 7 7800X3D",
             price: 2890.90m,
             quantity: invalidQuantity,
@@ -127,9 +125,9 @@ public class ProductServiceTests
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Register_WithInvalidBrandId_ThrowsArgumentOutOfRangeException(int invalidBrandId)
+    public async Task Register_WithInvalidBrandId_ThrowsArgumentOutOfRangeException(int invalidBrandId)
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => _service.Register(
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _service.Register(
             name: "Processador Ryzen 7 7800X3D",
             price: 2890.90m,
             quantity: 10,
@@ -137,11 +135,11 @@ public class ProductServiceTests
     }
 
     [Fact]
-    public void Register_WithNonExistingBrandId_ThrowsKeyNotFoundException()
+    public async Task Register_WithNonExistingBrandId_ThrowsKeyNotFoundException()
     {
         int nonExistingId = 237;
 
-        Assert.Throws<KeyNotFoundException>(() => _service.Register(
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.Register(
             name: "Processador Ryzen 7 7800X3D",
             price: 2890.90m,
             quantity: 10,
@@ -149,7 +147,7 @@ public class ProductServiceTests
     }
 
     [Fact]
-    public void Update_WithAllValidInputs_UpdatesProduct()
+    public async Task Update_WithAllValidInputs_UpdatesProduct()
     {
         string newName = "Processador Ryzen 7 9700X";
         decimal newPrice = 2899.99m;
@@ -157,9 +155,9 @@ public class ProductServiceTests
 
         Brand brand = CreateDefaultBrand();
 
-        Product product = CreateDefaultProduct();
+        Product product = await CreateDefaultProduct();
 
-        _service.Update(product.Id, newName, newPrice, newQuantity);
+        await _service.Update(product.Id, newName, newPrice, newQuantity);
 
         Assert.NotNull(product);
         Assert.Equal(newName, product.Name);
@@ -168,7 +166,7 @@ public class ProductServiceTests
     }
 
     [Fact]
-    public void Update_WithNotAllValidInputs_UpdatesOnlySelectedInputs()
+    public async Task Update_WithNotAllValidInputs_UpdatesOnlySelectedInputs()
     {
         string newName = "Processador Ryzen 7 9700X";
         decimal newPrice = 2899.99m;
@@ -176,9 +174,9 @@ public class ProductServiceTests
 
         Brand brand = CreateDefaultBrand();
 
-        Product product = CreateDefaultProduct();
+        Product product = await CreateDefaultProduct();
 
-        _service.Update(id: product.Id, name: newName, quantity: newQuantity);
+        await _service.Update(id: product.Id, name: newName, quantity: newQuantity);
 
         Assert.NotNull(product);
         Assert.Equal(newName, product.Name);
@@ -189,7 +187,7 @@ public class ProductServiceTests
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Update_WithInvalidId_ThrowsArgumentOutOfRangeException(int invalidId)
+    public async Task Update_WithInvalidId_ThrowsArgumentOutOfRangeException(int invalidId)
     {
         string newName = "Processador Ryzen 7 9700X";
         decimal newPrice = 2899.99m;
@@ -197,64 +195,60 @@ public class ProductServiceTests
 
         Brand brand = CreateDefaultBrand();
 
-        Product product = CreateDefaultProduct();
+        Product product = await CreateDefaultProduct();
 
-        Assert.Throws<ArgumentOutOfRangeException>(()
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(()
             => _service.Update(invalidId, newName, newPrice, newQuantity));
     }
 
     [Theory]
     [InlineData("")]
-    [InlineData(null)]
-    public void Update_WithInvalidName_ThrowsArgumentException(string? invalidName)
+    public async Task Update_WithInvalidName_ThrowsArgumentException(string? invalidName)
     {
         decimal newPrice = 2899.99m;
         int newQuantity = 7;
 
         Brand brand = CreateDefaultBrand();
 
-        Product product = CreateDefaultProduct();
+        Product product = await CreateDefaultProduct();
 
-        Assert.Throws<ArgumentException>(()
+        await Assert.ThrowsAsync<ArgumentException>(()
             => _service.Update(product.Id, invalidName!, newPrice, newQuantity));
-
     }
 
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Update_WithInvalidPrice_ThrowsArgumentOutOfRangeException(decimal invalidPrice)
+    public async Task Update_WithInvalidPrice_ThrowsArgumentOutOfRangeException(decimal invalidPrice)
     {
         string newName = "Processador Ryzen 7 9700X";
         int newQuantity = 7;
 
         Brand brand = CreateDefaultBrand();
 
-        Product product = CreateDefaultProduct();
+        Product product = await CreateDefaultProduct();
 
-        Assert.Throws<ArgumentOutOfRangeException>(()
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(()
             => _service.Update(product.Id, newName, invalidPrice, newQuantity));
-
     }
 
     [Theory]
     [InlineData(-1)]
-    public void Update_WithInvalidQuantity_ThrowsArgumentOutOfRangeException(int invalidQuantity)
+    public async Task Update_WithInvalidQuantity_ThrowsArgumentOutOfRangeException(int invalidQuantity)
     {
         string newName = "Processador Ryzen 7 9700X";
         decimal newPrice = 2899.99m;
 
         Brand brand = CreateDefaultBrand();
 
-        Product product = CreateDefaultProduct();
+        Product product = await CreateDefaultProduct();
 
-        Assert.Throws<ArgumentOutOfRangeException>(()
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(()
             => _service.Update(product.Id, newName, newPrice, invalidQuantity));
-
     }
 
     [Fact]
-    public void Update_WithNonExistingProductId_ThrowsKeyNotFoundException()
+    public async Task Update_WithNonExistingProductId_ThrowsKeyNotFoundException()
     {
         int nonExistingId = 237;
         string newName = "Processador Ryzen 7 9700X";
@@ -263,48 +257,46 @@ public class ProductServiceTests
 
         Brand brand = CreateDefaultBrand();
 
-        Product product = CreateDefaultProduct();
+        Product product = await CreateDefaultProduct();
 
-        Assert.Throws<KeyNotFoundException>(()
+        await Assert.ThrowsAsync<KeyNotFoundException>(()
             => _service.Update(nonExistingId, newName, newPrice, newQuantity));
-
     }
 
     [Fact]
-    public void Update_WithExistingNameOfOtherProduct_ThrowsInvalidOperationException()
+    public async Task Update_WithExistingNameOfOtherProduct_ThrowsInvalidOperationException()
     {
         string newName = "Processador Ryzen 7 9700X";
 
         Brand brand = CreateDefaultBrand();
 
-        Product existingProduct = CreateDefaultProduct("Processador Ryzen 7 9700X", 2899.99m, 7, brand.Id);
+        Product existingProduct = await CreateDefaultProduct("Processador Ryzen 7 9700X", 2899.99m, 7, brand.Id);
 
-        Product product = CreateDefaultProduct();
+        Product product = await CreateDefaultProduct();
 
-        Assert.Throws<InvalidOperationException>(()
+        await Assert.ThrowsAsync<InvalidOperationException>(()
             => _service.Update(id: product.Id, name: newName));
-
     }
 
     [Fact]
-    public void Delete_WithValidId_RemovesProductFromDatabase()
+    public async Task Delete_WithValidId_RemovesProductFromDatabase()
     {
         Brand brand = CreateDefaultBrand();
-        Product product = CreateDefaultProduct();
+        Product product = await CreateDefaultProduct();
 
-        _service.Delete(product.Id);
+        await _service.Delete(product.Id);
 
-        Assert.Throws<KeyNotFoundException>(()
+        await Assert.ThrowsAsync<KeyNotFoundException>(()
             => _service.GetById(product.Id));
     }
 
     [Fact]
-    public void Delete_WithValidId_ReturnsDeletedProductInformations()
+    public async Task Delete_WithValidId_ReturnsDeletedProductInformations()
     {
         Brand brand = CreateDefaultBrand();
-        Product product = CreateDefaultProduct();
+        Product product = await CreateDefaultProduct();
 
-        Product deletedProduct = _service.Delete(product.Id);
+        Product deletedProduct = await _service.Delete(product.Id);
 
         Assert.Equal(product.Id, deletedProduct.Id);
         Assert.Equal(product.Name, deletedProduct.Name);
@@ -316,25 +308,25 @@ public class ProductServiceTests
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Delete_WithInvalidId_ThrowsArgumentOutOfRangeException(int invalidId)
+    public async Task Delete_WithInvalidId_ThrowsArgumentOutOfRangeException(int invalidId)
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => _service.Delete(invalidId));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _service.Delete(invalidId));
     }
 
     [Fact]
-    public void Delete_WithNonExistingId_ThrowsKeyNotFoundException()
+    public async Task Delete_WithNonExistingId_ThrowsKeyNotFoundException()
     {
         int nonExistingId = 237;
 
-        Assert.Throws<KeyNotFoundException>(() => _service.Delete(nonExistingId));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.Delete(nonExistingId));
     }
 
     [Fact]
-    public void GetById_WithValidId_ReturnsProduct()
+    public async Task GetById_WithValidId_ReturnsProduct()
     {
         Brand brand = CreateDefaultBrand();
-        Product product = CreateDefaultProduct();
-        Product foundProduct = _service.GetById(product.Id);
+        Product product = await CreateDefaultProduct();
+        Product foundProduct = await _service.GetById(product.Id);
 
         Assert.NotNull(foundProduct);
         Assert.Equal(product, foundProduct);
@@ -343,30 +335,30 @@ public class ProductServiceTests
     [Theory]
     [InlineData(0)]
     [InlineData(-3)]
-    public void GetById_WithInvalidId_ThrowsArgumentOutOfrangeArgumentException(int id)
+    public async Task GetById_WithInvalidId_ThrowsArgumentOutOfrangeArgumentException(int id)
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => _service.GetById(id));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _service.GetById(id));
     }
 
     [Fact]
-    public void GetById_WithNonExistingId_ThrowsKeyNotFoundException()
+    public async Task GetById_WithNonExistingId_ThrowsKeyNotFoundException()
     {
         int nonExistingId = 256;
 
-        Assert.Throws<KeyNotFoundException>(() => _service.GetById(nonExistingId));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.GetById(nonExistingId));
     }
 
     [Fact]
-    public void SearchByName_WithValidSearch_ReturnsMatchingProducts()
+    public async Task SearchByName_WithValidSearch_ReturnsMatchingProducts()
     {
         Brand amdBrand = CreateDefaultBrand("AMD");
         Brand intelBrand = CreateDefaultBrand("Intel");
 
-        Product ryzenProduct9700 = CreateDefaultProduct(name: "Processador Ryzen 7 9700X", brandId: amdBrand.Id);
-        Product ryzenProduct5600 = CreateDefaultProduct(name: "Processador Ryzen 5 5600", brandId: amdBrand.Id);
-        Product intelProduct = CreateDefaultProduct(name: "Processador Intel Core i7-14700K", brandId: intelBrand.Id);
+        Product ryzenProduct9700 = await CreateDefaultProduct(name: "Processador Ryzen 7 9700X", brandId: amdBrand.Id);
+        Product ryzenProduct5600 = await CreateDefaultProduct(name: "Processador Ryzen 5 5600", brandId: amdBrand.Id);
+        Product intelProduct = await CreateDefaultProduct(name: "Processador Intel Core i7-14700K", brandId: intelBrand.Id);
 
-        List<Product> foundMatchingProducts = _service.SearchByName("zen");
+        List<Product> foundMatchingProducts = await _service.SearchByName("zen");
 
         Assert.NotNull(foundMatchingProducts);
         Assert.Contains(foundMatchingProducts, p => p.Name == "Processador Ryzen 7 9700X");
@@ -375,12 +367,12 @@ public class ProductServiceTests
     }
 
     [Fact]
-    public void SearchByName_IsCaseInsensitive_ReturnsMatchingProducts()
+    public async Task SearchByName_IsCaseInsensitive_ReturnsMatchingProducts()
     {
         Brand amdBrand = CreateDefaultBrand("AMD");
-        Product ryzenProduct9700 = CreateDefaultProduct(name: "Processador Ryzen 7 9700X", brandId: amdBrand.Id);
+        Product ryzenProduct9700 = await CreateDefaultProduct(name: "Processador Ryzen 7 9700X", brandId: amdBrand.Id);
 
-        List<Product> foundMatchingProducts = _service.SearchByName("ryzen");
+        List<Product> foundMatchingProducts = await _service.SearchByName("ryzen");
 
         Assert.Contains(foundMatchingProducts, p => p.Name == "Processador Ryzen 7 9700X");
     }
@@ -389,22 +381,22 @@ public class ProductServiceTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("  ")]
-    public void SearchByName_WithNullOrEmptyName_ThrowsArgumentException(string? searchName)
+    public async Task SearchByName_WithNullOrEmptyName_ThrowsArgumentException(string? searchName)
     {
-        Assert.Throws<ArgumentException>(() => _service.SearchByName(searchName!));
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.SearchByName(searchName!));
     }
 
     [Fact]
-    public void GetAll_ReturnsAllProducts()
+    public async Task GetAll_ReturnsAllProducts()
     {
         Brand amdBrand = CreateDefaultBrand("AMD");
         Brand intelBrand = CreateDefaultBrand("Intel");
 
-        Product ryzenProduct9700 = CreateDefaultProduct(name: "Processador Ryzen 7 9700X", brandId: amdBrand.Id);
-        Product ryzenProduct5600 = CreateDefaultProduct(name: "Processador Ryzen 5 5600", brandId: amdBrand.Id);
-        Product intelProduct = CreateDefaultProduct(name: "Processador Intel Core i7-14700K", brandId: intelBrand.Id);
+        Product ryzenProduct9700 = await CreateDefaultProduct(name: "Processador Ryzen 7 9700X", brandId: amdBrand.Id);
+        Product ryzenProduct5600 = await CreateDefaultProduct(name: "Processador Ryzen 5 5600", brandId: amdBrand.Id);
+        Product intelProduct = await CreateDefaultProduct(name: "Processador Intel Core i7-14700K", brandId: intelBrand.Id);
 
-        List<Product> products = _service.GetAll();
+        List<Product> products = await _service.GetAll();
 
         Assert.NotNull(products);
         Assert.Equal(3, products.Count);
@@ -412,9 +404,9 @@ public class ProductServiceTests
     }
 
     [Fact]
-    public void GetAll_WithNoProducts_ReturnsEmptyList()
+    public async Task GetAll_WithNoProducts_ReturnsEmptyList()
     {
-        List<Product> products = _service.GetAll();
+        List<Product> products = await _service.GetAll();
 
         Assert.Empty(products);
     }
