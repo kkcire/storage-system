@@ -21,4 +21,4 @@ ProductMenu productMenu = new(productService);
 
 Menu menu = new(brandMenu, productMenu);
 
-menu.Run();
+await menu.Run();

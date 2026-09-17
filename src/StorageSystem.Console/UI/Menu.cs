@@ -5,7 +5,7 @@ namespace StorageSystem.Console.UI;
 public class Menu(BrandMenu brandMenu, ProductMenu productMenu)
 {
 
-    public void Run()
+    public async Task Run()
     {
         bool exit = false;
 
@@ -23,10 +23,10 @@ public class Menu(BrandMenu brandMenu, ProductMenu productMenu)
             switch (option)
             {
                 case "Manage Brands":
-                    brandMenu.Run();
+                    await brandMenu.Run();
                     break;
                 case "Manage Products":
-                    productMenu.Run();
+                    await productMenu.Run();
                     break;
                 case "Exit":
                     exit = true;
