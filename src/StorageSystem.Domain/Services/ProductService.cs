@@ -5,7 +5,7 @@ namespace StorageSystem.Domain.Services;
 
 public class ProductService(StorageContext context)
 {
-    public Product Register(string name, decimal price, int quantity, int brandId)
+    public async Task<Product> Register(string name, decimal price, int quantity, int brandId)
     {
         GuardClause.AgainstNullOrEmptyName(name);
         GuardClause.AgainstZeroOrNegativePrice(price);
@@ -13,10 +13,10 @@ public class ProductService(StorageContext context)
         GuardClause.AgainstZeroOrNegativeId(brandId);
 
         string trimmedName = name.Trim();
-        bool productExist = context.Products.Any(p => p.Name == trimmedName);
-        var brand = context.Brands.Find(brandId);
-
-        if (brand == null)
+        bool productExist = await context.Products.AnyAsync(p => p.Name == trimmedName);
+        bool brandExist = await context.Brands.AnyAsync(b => b.Id == brandId);
+    
+        if (!brandExist)
             throw new KeyNotFoundException($"The brand with ID {brandId} was not found.");
 
         if (productExist)
@@ -25,13 +25,13 @@ public class ProductService(StorageContext context)
         Product product = new() { Name = trimmedName, Price = price, Quantity = quantity, BrandId = brandId };
 
         context.Products.Add(product);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
         return product;
     }
 
-    public Product Update(int id, string? name = null, decimal? price = null, int? quantity = null)
+    public async Task<Product> Update(int id, string? name = null, decimal? price = null, int? quantity = null)
     {
-        var product = GetById(id);
+        var product = await GetById(id);
 
         if (name is not null)
         {
@@ -39,7 +39,7 @@ public class ProductService(StorageContext context)
 
             string trimmedName = name.Trim();
 
-            bool identicalProductExist = context.Products.Any(p => p.Name == trimmedName && p.Id != id);
+            bool identicalProductExist = await context.Products.AnyAsync(p => p.Name == trimmedName && p.Id != id);
 
             if (identicalProductExist)
                 throw new InvalidOperationException($"A product with the name {trimmedName} already exists");
@@ -62,26 +62,26 @@ public class ProductService(StorageContext context)
             product.Quantity = quantity.Value;
         }
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
         return product;
     }
 
-    public Product Delete(int id)
+    public async Task<Product> Delete(int id)
     {
-        var product = GetById(id);
+        var product = await GetById(id);
 
         context.Products.Remove(product);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         return product;
     }
 
 
-    public Product GetById(int id)
+    public async Task<Product> GetById(int id)
     {
         GuardClause.AgainstZeroOrNegativeId(id);
 
-        var product = context.Products.Find(id);
+        var product = await context.Products.FindAsync(id);
 
         if (product == null)
             throw new KeyNotFoundException($"The product with ID {id} was not found.");
@@ -89,29 +89,29 @@ public class ProductService(StorageContext context)
         return product;
     }
 
-    public List<Product> SearchByName(string name)
+    public async Task<List<Product>> SearchByName(string name)
     {
         GuardClause.AgainstNullOrEmptyName(name);
 
-        return context.Products
+        return await context.Products
             .Where(p => p.Name.ToLower().Contains(name.ToLower()))
-            .ToList();
+            .ToListAsync();
     }
 
-    public List<Product> GetAll()
+    public async Task<List<Product>> GetAll()
     {
-        return context.Products.ToList();
+        return await context.Products.ToListAsync();
     }
 
-    public Product AdjustStockQuantity(int id, int amount)
+    public async Task<Product> AdjustStockQuantity(int id, int amount)
     {
-        var product = GetById(id);
+        var product = await GetById(id);
 
         if (amount + product.Quantity < 0)
             throw new InvalidOperationException("The value cannot leaves the stock negative");
 
         product.Quantity += amount;
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         return product;
     }

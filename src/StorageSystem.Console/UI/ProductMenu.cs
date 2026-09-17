@@ -6,7 +6,7 @@ namespace StorageSystem.Console.UI;
 
 public class ProductMenu(ProductService productService)
 {
-    public void Run()
+    public async Task Run()
     {
         bool exit = false;
 
@@ -23,21 +23,21 @@ public class ProductMenu(ProductService productService)
 
             switch (option)
             {
-                case "Register": Register(); break;
-                case "Update": Update(); break;
-                case "Delete": Delete(); break;
-                case "Search by ID": SearchById(); break;
-                case "Search by Name": SearchByName(); break;
-                case "List All": ListAll(); break;
+                case "Register": await Register(); break;
+                case "Update": await Update(); break;
+                case "Delete": await Delete(); break;
+                case "Search by ID": await SearchById(); break;
+                case "Search by Name": await SearchByName(); break;
+                case "List All": await ListAll(); break;
                 case "Back to Main Menu": exit = true; break;
-                case "Adjust Stock": AdjustStock(); break;
+                case "Adjust Stock": await AdjustStock(); break;
             }
         }
 
         AnsiConsole.Clear();
     }
 
-    public void Register()
+    public async Task Register()
     {
         var data = new Dictionary<string, string>();
         string title = "Registering Product";
@@ -59,14 +59,14 @@ public class ProductMenu(ProductService productService)
         int brandId = AnsiConsole.Prompt(new TextPrompt<int>("Enter the brand ID for the product:"));
         data["BrandId"] = brandId.ToString();
 
-        HandleAction(() =>
+        await HandleAction(async () =>
         {
-            var product = productService.Register(name, price, quantity, brandId);
+            var product = await productService.Register(name, price, quantity, brandId);
             AnsiConsole.MarkupLine($"[green]Product '{product.Name}' registered successfully with ID {product.Id}.[/]");
         }, "Registering product...");
     }
 
-    public void Update()
+    public async Task Update()
     {
         var data = new Dictionary<string, string>();
         string title = "Updating Product";
@@ -93,14 +93,14 @@ public class ProductMenu(ProductService productService)
                 .AllowEmpty());
         data["New Quantity"] = quantity?.ToString() ?? "No Change";
 
-        HandleAction(() =>
+        await HandleAction(async () =>
         {
-            var updatedProduct = productService.Update(id, name, price, quantity);
+            var updatedProduct = await productService.Update(id, name, price, quantity);
             AnsiConsole.MarkupLine($"[green]Product '{updatedProduct.Name}' updated successfully.[/]");
         }, "Updating product...");
     }
 
-    public void Delete()
+    public async Task Delete()
     {
         var data = new Dictionary<string, string>();
         string title = "Deleting Product";
@@ -109,31 +109,31 @@ public class ProductMenu(ProductService productService)
         data["Product ID"] = id.ToString();
         ShowPanel(title, data);
 
-        HandleAction(() =>
+        await HandleAction(async () =>
         {
-            Product deletedProduct = productService.Delete(id);
+            Product deletedProduct = await productService.Delete(id);
             AnsiConsole.MarkupLine($"[green]Product '{deletedProduct.Name}' deleted successfully.[/]");
         }, "Deleting product...");
     }
 
-    public void SearchById()
+    public async Task SearchById()
     {
         int id = AnsiConsole.Prompt(new TextPrompt<int>("Enter the product ID to search:"));
 
-        HandleAction(() =>
+        await HandleAction(async () =>
         {
-            Product product = productService.GetById(id);
+            Product product = await productService.GetById(id);
             PrintProductTable([product]);
         }, "Searching...");
     }
 
-    public void SearchByName()
+    public async Task SearchByName()
     {
         string name = AnsiConsole.Prompt(new TextPrompt<string>("Enter the product name to search:"));
 
-        HandleAction(() =>
+        await HandleAction(async () =>
         {
-            List<Product> products = productService.SearchByName(name);
+            List<Product> products = await productService.SearchByName(name);
             if (products.Count == 0)
                 AnsiConsole.MarkupLine($"[yellow]No products found with the name '{name}'.[/]");
             else
@@ -141,11 +141,11 @@ public class ProductMenu(ProductService productService)
         }, "Searching...");
     }
 
-    public void ListAll()
+    public async Task ListAll()
     {
-        HandleAction(() =>
+        await HandleAction(async () =>
         {
-            List<Product> products = productService.GetAll();
+            List<Product> products = await productService.GetAll();
             if (products.Count == 0)
                 AnsiConsole.MarkupLine("[yellow]No products available.[/]");
             else
@@ -153,14 +153,14 @@ public class ProductMenu(ProductService productService)
         }, "Loading products...");
     }
 
-    public void AdjustStock()
+    public async Task AdjustStock()
     {
         int id = AnsiConsole.Prompt(new TextPrompt<int>("Enter the product ID:"));
         int amount = AnsiConsole.Prompt(new TextPrompt<int>("Enter the amount (use negative to remove stock):"));
 
-        HandleAction(() =>
+        await HandleAction(async () =>
         {
-            var product = productService.AdjustStockQuantity(id, amount);
+            var product = await productService.AdjustStockQuantity(id, amount);
             AnsiConsole.MarkupLine($"[green]Stock adjusted. '{product.Name}' now has {product.Quantity} units.[/]");
         }, "Adjusting stock...");
     }
@@ -180,16 +180,15 @@ public class ProductMenu(ProductService productService)
         AnsiConsole.Write(table);
     }
 
-    private static void HandleAction(Action action, string processingMessage = "Processing...")
+    private static async Task HandleAction(Func<Task> action, string processingMessage = "Processing...")
     {
         try
         {
-            AnsiConsole.Status()
+            await AnsiConsole.Status()
                 .Spinner(Spinner.Known.Dots)
-                .Start(processingMessage, ctx =>
+                .StartAsync(processingMessage, async ctx =>
                 {
-                    Thread.Sleep(400);
-                    action();
+                    await action();
                 });
         }
         catch (Exception ex)
