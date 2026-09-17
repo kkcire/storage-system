@@ -6,7 +6,7 @@ namespace StorageSystem.Console.UI;
 
 public class BrandMenu(BrandService brandService)
 {
-    public void Run()
+    public async Task Run()
     {
         bool exit = false;
 
@@ -23,12 +23,12 @@ public class BrandMenu(BrandService brandService)
 
             switch (option)
             {
-                case "Register": Register(); break;
-                case "Update": Update(); break;
-                case "Delete": Delete(); break;
-                case "Search by ID": SearchById(); break;
-                case "Search by Name": SearchByName(); break;
-                case "List All": ListAll(); break;
+                case "Register": await Register(); break;
+                case "Update": await Update(); break;
+                case "Delete": await Delete(); break;
+                case "Search by ID": await SearchById(); break;
+                case "Search by Name": await SearchByName(); break;
+                case "List All": await ListAll(); break;
                 case "Back to Main Menu": exit = true; break;
             }
         }
@@ -36,58 +36,58 @@ public class BrandMenu(BrandService brandService)
         AnsiConsole.Clear();
     }
 
-    public void Register()
+    public async Task Register()
     {
         string name = AnsiConsole.Prompt(new TextPrompt<string>("Enter the [green]brand name[/]:"));
 
-        HandleAction(() =>
+        await HandleActionAsync(async () =>
         {
-            Brand brand = brandService.Register(name);
+            Brand brand = await brandService.Register(name);
             AnsiConsole.MarkupLine($"[green]Brand '{brand.Name}' added successfully.[/]");
         }, "Registering brand...");
     }
 
-    public void Update()
+    public async Task Update()
     {
         int id = AnsiConsole.Prompt(new TextPrompt<int>("Enter the [green]brand ID[/] to update:"));
         string newName = AnsiConsole.Prompt(new TextPrompt<string>("Enter the [green]new brand name[/]:"));
 
-        HandleAction(() =>
+        await HandleActionAsync(async () =>
         {
-            Brand updatedBrand = brandService.Update(id, newName);
+            Brand updatedBrand = await brandService.Update(id, newName);
             AnsiConsole.MarkupLine($"[green]Brand ID {updatedBrand.Id} updated to '{updatedBrand.Name}'.[/]");
         }, "Updating brand...");
     }
 
-    public void Delete()
+    public async Task Delete()
     {
         int id = AnsiConsole.Prompt(new TextPrompt<int>("Enter the [green]brand ID[/] to delete:"));
 
-        HandleAction(() =>
+        await HandleActionAsync(async () =>
         {
-            string deletedName = brandService.Delete(id);
+            string deletedName = await brandService.Delete(id);
             AnsiConsole.MarkupLine($"[green]Brand '{deletedName}' deleted successfully.[/]");
         }, "Deleting brand...");
     }
 
-    public void SearchById()
+    public async Task SearchById()
     {
         int id = AnsiConsole.Prompt(new TextPrompt<int>("Enter the [green]brand ID[/] to search:"));
 
-        HandleAction(() =>
+        await HandleActionAsync(async () =>
         {
-            Brand brand = brandService.GetById(id);
+            Brand brand = await brandService.GetById(id);
             PrintBrandTable([brand]);
         }, "Searching...");
     }
 
-    public void SearchByName()
+    public async Task SearchByName()
     {
         string name = AnsiConsole.Prompt(new TextPrompt<string>("Enter the [green]brand name[/] to search:"));
 
-        HandleAction(() =>
+        await HandleActionAsync(async () =>
         {
-            List<Brand> brands = brandService.SearchByName(name);
+            List<Brand> brands = await brandService.SearchByName(name);
             if (brands.Count == 0)
                 AnsiConsole.MarkupLine("[yellow]No brands found.[/]");
             else
@@ -95,11 +95,11 @@ public class BrandMenu(BrandService brandService)
         }, "Searching...");
     }
 
-    public void ListAll()
+    public async Task ListAll()
     {
-        HandleAction(() =>
+        await HandleActionAsync(async () =>
         {
-            List<Brand> brands = brandService.GetAll();
+            List<Brand> brands = await brandService.GetAll();
             if (brands.Count == 0)
                 AnsiConsole.MarkupLine("[yellow]No brands available.[/]");
             else
@@ -119,16 +119,15 @@ public class BrandMenu(BrandService brandService)
         AnsiConsole.Write(table);
     }
 
-    private static void HandleAction(Action action, string processingMessage = "Processing...")
+    private static async Task HandleActionAsync(Func<Task> action, string processingMessage = "Processing...")
     {
         try
         {
-            AnsiConsole.Status()
+            await AnsiConsole.Status()
                 .Spinner(Spinner.Known.Dots)
-                .Start(processingMessage, ctx =>
+                .StartAsync(processingMessage, async ctx =>
                 {
-                    Thread.Sleep(1600);
-                    action();
+                    await action();
                 });
         }
         catch (Exception ex)

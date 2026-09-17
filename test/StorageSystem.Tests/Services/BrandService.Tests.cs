@@ -1,4 +1,5 @@
 using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using StorageSystem.Domain.Data;
 using StorageSystem.Domain.Entities;
 using StorageSystem.Domain.Services;
@@ -26,11 +27,11 @@ public class BrandServiceTests
     }
 
     [Fact]
-    public void Register_WithValidName_ReturnsNewBrand()
+    public async Task Register_WithValidName_ReturnsNewBrand()
     {
         string name = "Spotify";
 
-        Brand brand = _service.Register(name);
+        Brand brand = await _service.Register(name);
 
         Assert.NotNull(brand);
         Assert.Equal(name, brand.Name);
@@ -40,69 +41,69 @@ public class BrandServiceTests
     [Theory]
     [InlineData("")]
     [InlineData(null)]
-    public void Register_WithInvalidName_ThrowsArgumentException(string? invalidName)
+    public async Task Register_WithInvalidName_ThrowsArgumentException(string? invalidName)
     {
-        Assert.Throws<ArgumentException>(() => _service.Register(invalidName!));
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.Register(invalidName!));
     }
 
     [Fact]
-    public void Update_WithValidIdAndName_UpdatesBrand()
+    public async Task Update_WithValidIdAndName_UpdatesBrand()
     {
-        Brand brand = _service.Register("Old Name");
+        Brand brand = await _service.Register("Old Name");
 
-        Brand result = _service.Update(brand.Id, "New Name");
+        Brand result = await _service.Update(brand.Id, "New Name");
 
         Assert.Equal("New Name", result.Name);
     }
 
     [Fact]
-    public void Update_WithNonExistingId_ThrowsKeyNotFoundExcepton()
+    public async Task Update_WithNonExistingId_ThrowsKeyNotFoundExcepton()
     {
-        Assert.Throws<KeyNotFoundException>(() => _service.Update(999, "Samsung"));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.Update(999, "Samsung"));
     }
 
     [Fact]
-    public void Update_WithInvalidIdAndName_ThrowsArgumentExceptionForNameFirst()
+    public async Task Update_WithInvalidIdAndName_ThrowsArgumentExceptionForNameFirst()
     {
-        Assert.Throws<ArgumentException>(() => _service.Update(-2, ""));
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.Update(-2, ""));
     }
 
     [Theory]
     [InlineData("")]
     [InlineData(null)]
-    public void Update_WithInvalidName_ThrowsArgumentException(string? invalidName)
+    public async Task Update_WithInvalidName_ThrowsArgumentException(string? invalidName)
     {
-        Assert.Throws<ArgumentException>(() => _service.Update(1, invalidName!));
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.Update(1, invalidName!));
     }
 
     [Theory]
     [InlineData(0)]
     [InlineData(-2)]
-    public void Update_WithInvalidId_ThrowsOutOfRangeArgumentException(int invalidId)
+    public async Task Update_WithInvalidId_ThrowsOutOfRangeArgumentException(int invalidId)
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => _service.Update(invalidId, "Spotify"));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _service.Update(invalidId, "Spotify"));
     }
 
     [Fact]
-    public void Delete_WithValidId_RemovesBrandFromDatabase()
+    public async Task Delete_WithValidId_RemovesBrandFromDatabase()
     {
         Brand brand = new() { Name = "Fender" };
         _context.Brands.Add(brand);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
-        _service.Delete(brand.Id);
+        await _service.Delete(brand.Id);
 
-        Assert.Throws<KeyNotFoundException>(() => _service.GetById(brand.Id));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.GetById(brand.Id));
     }
 
     [Fact]
-    public void Delete_WithValidId_ReturnsDeletedBrandName()
+    public async Task Delete_WithValidId_ReturnsDeletedBrandName()
     {
         Brand brand = new() { Name = "Fender" };
         _context.Brands.Add(brand);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
-        string deletedName = _service.Delete(brand.Id);
+        string deletedName = await _service.Delete(brand.Id);
 
         Assert.Equal("Fender", deletedName);
     }
@@ -110,24 +111,24 @@ public class BrandServiceTests
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Delete_WithInvalidId_ThrowsArgumentOutOfRangeException(int invalidId)
+    public async Task Delete_WithInvalidId_ThrowsArgumentOutOfRangeException(int invalidId)
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => _service.Delete(invalidId));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _service.Delete(invalidId));
     }
 
     [Fact]
-    public void Delete_WithNonExistingId_ThrowsKeyNotFoundException()
+    public async Task Delete_WithNonExistingId_ThrowsKeyNotFoundException()
     {
         int nonExistingId = 237;
 
-        Assert.Throws<KeyNotFoundException>(() => _service.Delete(nonExistingId));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.Delete(nonExistingId));
     }
 
     [Fact]
-    public void GetById_WithValidId_ReturnsBrand()
+    public async Task GetById_WithValidId_ReturnsBrand()
     {
-        Brand brand = _service.Register("Fender");
-        Brand result = _service.GetById(brand.Id);
+        Brand brand = await _service.Register("Fender");
+        Brand result = await _service.GetById(brand.Id);
 
         Assert.NotNull(result);
         Assert.Equal(brand.Id, result.Id);
@@ -137,28 +138,28 @@ public class BrandServiceTests
     [Theory]
     [InlineData(0)]
     [InlineData(-3)]
-    public void GetById_WithInvalidId_ThrowsArgumentOutOfrangeArgumentException(int id)
+    public async Task GetById_WithInvalidId_ThrowsArgumentOutOfrangeArgumentException(int id)
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => _service.GetById(id));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _service.GetById(id));
     }
 
     [Fact]
-    public void GetById_WithNonExistingId_ThrowsKeyNotFoundException()
+    public async Task GetById_WithNonExistingId_ThrowsKeyNotFoundException()
     {
         int nonExistingId = 256;
 
-        Assert.Throws<KeyNotFoundException>(() => _service.GetById(nonExistingId));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.GetById(nonExistingId));
     }
 
     [Fact]
-    public void SearchByName_WithValidSearch_ReturnsMatchingBrands()
+    public async Task SearchByName_WithValidSearch_ReturnsMatchingBrands()
     {
         _context.Brands.Add(new Brand { Name = "Fender" });
         _context.Brands.Add(new Brand { Name = "Gibson" });
         _context.Brands.Add(new Brand { Name = "Jackson" });
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
-        List<Brand> result = _service.SearchByName("on");
+        List<Brand> result = await _service.SearchByName("on");
 
         Assert.NotNull(result);
         Assert.Contains(result, b => b.Name == "Jackson");
@@ -167,12 +168,12 @@ public class BrandServiceTests
     }
 
     [Fact]
-    public void SearchByName_IsCaseInsensitive_ReturnsMatchingProducts()
+    public async Task SearchByName_IsCaseInsensitive_ReturnsMatchingProducts()
     {
         _context.Brands.Add(new Brand { Name = "AMD" });
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
-        List<Brand> foundMatchingProducts = _service.SearchByName("AM");
+        List<Brand> foundMatchingProducts = await _service.SearchByName("AM");
 
         Assert.Contains(foundMatchingProducts, p => p.Name == "AMD");
     }
@@ -181,20 +182,20 @@ public class BrandServiceTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("  ")]
-    public void SearchByName_WithNullOrEmptyName_ThrowsArgumentException(string? searchName)
+    public async Task SearchByName_WithNullOrEmptyName_ThrowsArgumentException(string? searchName)
     {
-        Assert.Throws<ArgumentException>(() => _service.SearchByName(searchName!));
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.SearchByName(searchName!));
     }
 
     [Fact]
-    public void GetAll_ReturnsAllBrands()
+    public async Task GetAll_ReturnsAllBrands()
     {
         _context.Brands.Add(new Brand { Name = "Fender" });
         _context.Brands.Add(new Brand { Name = "Gibson" });
         _context.Brands.Add(new Brand { Name = "Jackson" });
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
-        List<Brand> result = _service.GetAll();
+        List<Brand> result = await _service.GetAll();
 
         Assert.NotNull(result);
         Assert.Equal(3, result.Count);
@@ -202,9 +203,9 @@ public class BrandServiceTests
     }
 
     [Fact]
-    public void GetAll_WithNoBrands_ReturnsEmptyList()
+    public async Task GetAll_WithNoBrands_ReturnsEmptyList()
     {
-        List<Brand> result = _service.GetAll();
+        List<Brand> result = await _service.GetAll();
 
         Assert.Empty(result);
     }
