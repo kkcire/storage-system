@@ -94,7 +94,7 @@ public class ProductService(StorageContext context)
         GuardClause.AgainstNullOrEmptyName(name);
 
         return await context.Products
-            .Where(p => p.Name.ToLower().Contains(name))
+            .Where(p => p.Name.ToLower().Contains(name.ToLower()))
             .ToListAsync();
     }
 
