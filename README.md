@@ -17,7 +17,7 @@ The application manages products and brands through a console interface built wi
 * Persistence with Entity Framework Core and SQLite
 * Business-rule validation
 
-## Technologies
+## Tech Stack
 
 * C#
 * .NET 8
