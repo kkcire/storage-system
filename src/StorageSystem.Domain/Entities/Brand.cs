@@ -1,4 +1,4 @@
-using StorageSystem.Domain.Services;
+using StorageSystem.Domain.Guards;
 
 namespace StorageSystem.Domain.Entities;
 
@@ -12,7 +12,7 @@ public class Brand
 
     public static Brand Create(string name)
     {
-        GuardClause.AgainstNullOrEmptyName(name);
+        GuardClause.AgainstNullOrWhiteSpaceName(name);
 
         return new Brand
         {
@@ -22,7 +22,7 @@ public class Brand
 
     public void Rename(string newName)
     {
-        GuardClause.AgainstNullOrEmptyName(newName);
+        GuardClause.AgainstNullOrWhiteSpaceName(newName);
 
         Name = newName.Trim();
     }
