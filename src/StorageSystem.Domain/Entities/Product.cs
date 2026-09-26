@@ -12,7 +12,7 @@ public class Product
     public int BrandId { get; private set; }
     public Brand Brand { get; private set; } = default!;
 
-    private Product() { }
+    private Product() { } // EF Core
 
     public static Product Create(string name, decimal price, int quantity, int brandId)
     {

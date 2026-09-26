@@ -8,7 +8,7 @@ public class Brand
     public string Name { get; private set; } = default!;
     public ICollection<Product> Products { get; private set; } = new List<Product>();
 
-    private Brand() { }
+    private Brand() { } // EF Core
 
     public static Brand Create(string name)
     {
