@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StorageSystem.Domain.Entities;
 
-namespace StorageSystem.Domain.Data;
+namespace StorageSystem.Infrastructure.Data;
 
 public class StorageContext(DbContextOptions<StorageContext> options) : DbContext(options)
 {
