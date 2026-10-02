@@ -8,15 +8,19 @@ namespace StorageSystem.Infrastructure.Repository;
 public class ProductRepository(StorageContext context) : IProductRepository
 {
     public async Task<Product?> GetByIdAsync(int id, CancellationToken ct)
-        => await context.Products.FirstOrDefaultAsync(p => p.Id == id, ct);
+        => await context.Products
+            .Include(p => p.Brand)
+            .FirstOrDefaultAsync(p => p.Id == id, ct);
 
     public async Task<List<Product>> GetAllAsync(CancellationToken ct)
         => await context.Products
+            .Include(p => p.Brand)
             .AsNoTracking()
             .ToListAsync(ct);
 
     public async Task<List<Product>> SearchByNameAsync(string name, CancellationToken ct)
         => await context.Products
+            .Include(p => p.Brand)
             .AsNoTracking()
             .Where(p => p.Name.ToLower().Contains(name.ToLower()))
             .ToListAsync(ct);
