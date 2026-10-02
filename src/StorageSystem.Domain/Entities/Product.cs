@@ -58,7 +58,7 @@ public class Product
         ChangeQuantity(newQuantity);
     }
 
-    public void AdjustStock(int amount)
+    public void AddStock(int amount)
     {
         if (Quantity + amount < 0)
         {
