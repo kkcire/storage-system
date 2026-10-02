@@ -6,11 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Using Include="System.Console" Static="true" />
-    <Using Include="System.Linq" />
-    <Using Include="Microsoft.EntityFrameworkCore" />
-  </ItemGroup>
-
-
 </Project>
