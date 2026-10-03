@@ -1,4 +1,4 @@
-using StorageSystem.Domain.Services;
+using StorageSystem.Application.Services;
 using StorageSystem.Domain.Entities;
 using Spectre.Console;
 
@@ -61,7 +61,7 @@ public class ProductMenu(ProductService productService)
 
         await HandleAction(async () =>
         {
-            var product = await productService.Register(name, price, quantity, brandId);
+            var product = await productService.CreateAsync(name, price, quantity, brandId, CancellationToken.None);
             AnsiConsole.MarkupLine($"[green]Product '{product.Name}' registered successfully with ID {product.Id}.[/]");
         }, "Registering product...");
     }
@@ -75,27 +75,25 @@ public class ProductMenu(ProductService productService)
         data["Product ID"] = id.ToString();
 
         ShowPanel(title, data);
-        string? name = AnsiConsole.Prompt(
-            new TextPrompt<string>("Enter the new product name (or leave empty to keep current):")
-                .AllowEmpty());
-        name = string.IsNullOrWhiteSpace(name) ? null : name;
-        data["New Name"] = name ?? "No Change";
+        string name = AnsiConsole.Prompt(
+            new TextPrompt<string>("Enter the new product name:"));
+        data["New Name"] = name;
 
         ShowPanel(title, data);
-        decimal? price = AnsiConsole.Prompt(
-            new TextPrompt<decimal?>("Enter the new product price (or leave empty to keep current):")
+        decimal price = AnsiConsole.Prompt(
+            new TextPrompt<decimal>("Enter the new product price:")
                 .AllowEmpty());
-        data["New Price"] = price?.ToString("C") ?? "No Change";
+        data["New Price"] = price.ToString("C");
 
         ShowPanel(title, data);
-        int? quantity = AnsiConsole.Prompt(
-            new TextPrompt<int?>("Enter the new product quantity (or leave empty to keep current):")
+        int quantity = AnsiConsole.Prompt(
+            new TextPrompt<int>("Enter the new product quantity:")
                 .AllowEmpty());
-        data["New Quantity"] = quantity?.ToString() ?? "No Change";
+        data["New Quantity"] = quantity.ToString();
 
         await HandleAction(async () =>
         {
-            var updatedProduct = await productService.Update(id, name, price, quantity);
+            var updatedProduct = await productService.UpdateAsync(id, name, price, quantity, CancellationToken.None);
             AnsiConsole.MarkupLine($"[green]Product '{updatedProduct.Name}' updated successfully.[/]");
         }, "Updating product...");
     }
@@ -111,7 +109,7 @@ public class ProductMenu(ProductService productService)
 
         await HandleAction(async () =>
         {
-            Product deletedProduct = await productService.Delete(id);
+            var deletedProduct = await productService.DeleteAsync(id, CancellationToken.None);
             AnsiConsole.MarkupLine($"[green]Product '{deletedProduct.Name}' deleted successfully.[/]");
         }, "Deleting product...");
     }
@@ -122,7 +120,7 @@ public class ProductMenu(ProductService productService)
 
         await HandleAction(async () =>
         {
-            Product product = await productService.GetById(id);
+            Product product = await productService.GetByIdAsync(id, CancellationToken.None);
             PrintProductTable([product]);
         }, "Searching...");
     }
@@ -133,7 +131,7 @@ public class ProductMenu(ProductService productService)
 
         await HandleAction(async () =>
         {
-            List<Product> products = await productService.SearchByName(name);
+            List<Product> products = await productService.SearchByNameAsync(name, CancellationToken.None);
             if (products.Count == 0)
                 AnsiConsole.MarkupLine($"[yellow]No products found with the name '{name}'.[/]");
             else
@@ -145,7 +143,7 @@ public class ProductMenu(ProductService productService)
     {
         await HandleAction(async () =>
         {
-            List<Product> products = await productService.GetAll();
+            List<Product> products = await productService.GetAllAsync(CancellationToken.None);
             if (products.Count == 0)
                 AnsiConsole.MarkupLine("[yellow]No products available.[/]");
             else
@@ -160,7 +158,7 @@ public class ProductMenu(ProductService productService)
 
         await HandleAction(async () =>
         {
-            var product = await productService.AdjustStockQuantity(id, amount);
+            var product = await productService.AddStockAsync(id, amount, CancellationToken.None);
             AnsiConsole.MarkupLine($"[green]Stock adjusted. '{product.Name}' now has {product.Quantity} units.[/]");
         }, "Adjusting stock...");
     }
@@ -172,10 +170,10 @@ public class ProductMenu(ProductService productService)
         table.AddColumn("Name");
         table.AddColumn("Price");
         table.AddColumn("Quantity");
-        table.AddColumn("Brand ID");
+        table.AddColumn("Brand");
 
         foreach (var product in products)
-            table.AddRow(product.Id.ToString(), product.Name, product.Price.ToString("C"), product.Quantity.ToString(), product.BrandId.ToString());
+            table.AddRow(product.Id.ToString(), product.Name, product.Price.ToString("C"), product.Quantity.ToString(), product.Brand.Name);
 
         AnsiConsole.Write(table);
     }

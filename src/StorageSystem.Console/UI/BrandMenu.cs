@@ -1,6 +1,6 @@
-using Spectre.Console;
-using StorageSystem.Domain.Services;
+using StorageSystem.Application.Services;
 using StorageSystem.Domain.Entities;
+using Spectre.Console;
 
 namespace StorageSystem.Console.UI;
 
@@ -42,7 +42,7 @@ public class BrandMenu(BrandService brandService)
 
         await HandleActionAsync(async () =>
         {
-            Brand brand = await brandService.Register(name);
+            Brand brand = await brandService.CreateAsync(name, CancellationToken.None);
             AnsiConsole.MarkupLine($"[green]Brand '{brand.Name}' added successfully.[/]");
         }, "Registering brand...");
     }
@@ -54,7 +54,7 @@ public class BrandMenu(BrandService brandService)
 
         await HandleActionAsync(async () =>
         {
-            Brand updatedBrand = await brandService.Update(id, newName);
+            Brand updatedBrand = await brandService.UpdateAsync(id, newName, CancellationToken.None);
             AnsiConsole.MarkupLine($"[green]Brand ID {updatedBrand.Id} updated to '{updatedBrand.Name}'.[/]");
         }, "Updating brand...");
     }
@@ -65,8 +65,8 @@ public class BrandMenu(BrandService brandService)
 
         await HandleActionAsync(async () =>
         {
-            string deletedName = await brandService.Delete(id);
-            AnsiConsole.MarkupLine($"[green]Brand '{deletedName}' deleted successfully.[/]");
+            var deletedBrand = await brandService.DeleteAsync(id, CancellationToken.None);
+            AnsiConsole.MarkupLine($"[green]Brand '{deletedBrand.Name}' deleted successfully.[/]");
         }, "Deleting brand...");
     }
 
@@ -76,7 +76,7 @@ public class BrandMenu(BrandService brandService)
 
         await HandleActionAsync(async () =>
         {
-            Brand brand = await brandService.GetById(id);
+            Brand brand = await brandService.GetByIdAsync(id, CancellationToken.None);
             PrintBrandTable([brand]);
         }, "Searching...");
     }
@@ -87,7 +87,7 @@ public class BrandMenu(BrandService brandService)
 
         await HandleActionAsync(async () =>
         {
-            List<Brand> brands = await brandService.SearchByName(name);
+            List<Brand> brands = await brandService.SearchByNameAsync(name, CancellationToken.None);
             if (brands.Count == 0)
                 AnsiConsole.MarkupLine("[yellow]No brands found.[/]");
             else
@@ -99,7 +99,7 @@ public class BrandMenu(BrandService brandService)
     {
         await HandleActionAsync(async () =>
         {
-            List<Brand> brands = await brandService.GetAll();
+            List<Brand> brands = await brandService.GetAllAsync(CancellationToken.None);
             if (brands.Count == 0)
                 AnsiConsole.MarkupLine("[yellow]No brands available.[/]");
             else

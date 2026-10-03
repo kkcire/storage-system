@@ -1,6 +1,7 @@
-﻿using StorageSystem.Domain.Data;
-using StorageSystem.Domain.Entities;
-using StorageSystem.Domain.Services;
+﻿using StorageSystem.Application.Services;
+using StorageSystem.Application.Repository;
+using StorageSystem.Infrastructure.Data;
+using StorageSystem.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 using StorageSystem.Console.UI;
 
@@ -13,10 +14,14 @@ var options = new DbContextOptionsBuilder<StorageContext>()
 
 StorageContext context = new(options);
 
-BrandService brandService = new(context);
-BrandMenu brandMenu = new(brandService);
+IBrandRepository brandRepository = new BrandRepository(context);
+IProductRepository productRepository = new ProductRepository(context);
 
-ProductService productService = new(context);
+
+BrandService brandService = new(brandRepository);
+ProductService productService = new(productRepository);
+
+BrandMenu brandMenu = new(brandService);
 ProductMenu productMenu = new(productService);
 
 Menu menu = new(brandMenu, productMenu);
