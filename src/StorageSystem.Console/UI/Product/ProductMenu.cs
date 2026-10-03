@@ -23,7 +23,7 @@ public class ProductMenu(ProductService productService)
 
             switch (option)
             {
-                case "Register": await Register(); break;
+                case "Create": await Create(); break;
                 case "Update": await Update(); break;
                 case "Delete": await Delete(); break;
                 case "Search by ID": await SearchById(); break;
@@ -37,7 +37,7 @@ public class ProductMenu(ProductService productService)
         AnsiConsole.Clear();
     }
 
-    public async Task Register()
+    public async Task Create()
     {
         var data = new Dictionary<string, string>();
         string title = "Registering Product";
