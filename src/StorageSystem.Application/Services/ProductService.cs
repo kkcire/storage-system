@@ -38,6 +38,31 @@ public class ProductService(IProductRepository repository)
         return product;
     }
 
+    public async Task<Product> PatchAsync(int id, string? newName, decimal? newPrice, int? newQuantity, CancellationToken cancellationToken)
+    {
+        var product = await repository.GetByIdAsync(id, cancellationToken);
+        EnsureProductIsNotNull(product, id);
+
+        if (newName is not null)
+        {
+            string trimmedName = newName.Trim();
+
+            if (await repository.ExistsProductByNameAsync(trimmedName, ignoreId: product.Id, cancellationToken))
+                throw new DomainException($"A product with the name '{trimmedName}' already exists.");
+
+            product.Rename(trimmedName);
+        }
+
+        if (newPrice.HasValue)
+            product.ChangePrice(newPrice.Value);
+
+        if (newQuantity.HasValue)
+            product.ChangeQuantity(newQuantity.Value);
+
+        await repository.SaveChangesAsync(cancellationToken);
+        return product;
+    }
+
     public async Task<Product> DeleteAsync(int id, CancellationToken cancellationToken)
     {
         var product = await repository.GetByIdAsync(id, cancellationToken);
