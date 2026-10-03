@@ -51,6 +51,16 @@ public class Product
         Quantity = newQuantity;
     }
 
+    public void ChangeBrand(int newBrandId)
+    {
+        GuardClause.AgainstZeroOrNegativeId(newBrandId);
+
+        if (newBrandId == BrandId)
+            return; // No change needed
+
+        BrandId = newBrandId;
+    }
+
     public void Update(string newName, decimal newPrice, int newQuantity)
     {
         Rename(newName);
