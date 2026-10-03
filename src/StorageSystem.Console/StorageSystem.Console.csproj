@@ -2,6 +2,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StorageSystem.Domain\StorageSystem.Domain.csproj" />
+    <ProjectReference Include="..\StorageSystem.Application\StorageSystem.Application.csproj" />
+    <ProjectReference Include="..\StorageSystem.Infrastructure\StorageSystem.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
