@@ -63,6 +63,20 @@ public class ProductService(IProductRepository repository)
         return product;
     }
 
+    public async Task<Product> ChangeBrandAsync(int id, int newBrandId, CancellationToken cancellationToken)
+    {
+        var product = await repository.GetByIdAsync(id, cancellationToken);
+        EnsureProductIsNotNull(product, id);
+
+        if (!await repository.BrandExistsAsync(newBrandId, cancellationToken))
+            throw new DomainException($"The brand with ID {newBrandId} does not exist.");
+
+        product.ChangeBrand(newBrandId);
+
+        await repository.SaveChangesAsync(cancellationToken);
+        return product;
+    }
+
     public async Task<Product> DeleteAsync(int id, CancellationToken cancellationToken)
     {
         var product = await repository.GetByIdAsync(id, cancellationToken);
