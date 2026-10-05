@@ -22,7 +22,8 @@ BrandService brandService = new(brandRepository);
 ProductService productService = new(productRepository);
 
 BrandMenu brandMenu = new(brandService);
-ProductMenu productMenu = new(productService);
+UpdateMenu updateMenu = new(productService);
+ProductMenu productMenu = new(productService, updateMenu);
 
 Menu menu = new(brandMenu, productMenu);
 

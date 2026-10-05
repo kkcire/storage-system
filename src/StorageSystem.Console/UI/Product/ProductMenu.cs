@@ -1,10 +1,8 @@
-using StorageSystem.Application.Services;
-using StorageSystem.Domain.Entities;
-using Spectre.Console;
+
 
 namespace StorageSystem.Console.UI;
 
-public class ProductMenu(ProductService productService)
+public class ProductMenu(ProductService productService, UpdateMenu updateMenu)
 {
     public async Task Run()
     {
@@ -24,7 +22,7 @@ public class ProductMenu(ProductService productService)
             switch (option)
             {
                 case "Create": await Create(); break;
-                case "Update": await Update(); break;
+                case "Update": await updateMenu.Run(); break;
                 case "Delete": await Delete(); break;
                 case "Search by ID": await SearchById(); break;
                 case "Search by Name": await SearchByName(); break;
@@ -42,60 +40,28 @@ public class ProductMenu(ProductService productService)
         var data = new Dictionary<string, string>();
         string title = "Registering Product";
 
-        ShowPanel(title, data);
+        Helpers.ShowPanel(title, data);
         string name = AnsiConsole.Prompt(new TextPrompt<string>("Enter the product name:")
             .Validate(n => !string.IsNullOrWhiteSpace(n)));
         data["Name"] = name;
 
-        ShowPanel(title, data);
+        Helpers.ShowPanel(title, data);
         decimal price = AnsiConsole.Prompt(new TextPrompt<decimal>("Enter the product price:"));
         data["Price"] = price.ToString("C");
 
-        ShowPanel(title, data);
+        Helpers.ShowPanel(title, data);
         int quantity = AnsiConsole.Prompt(new TextPrompt<int>("Enter the product quantity:"));
         data["Quantity"] = quantity.ToString();
 
-        ShowPanel(title, data);
+        Helpers.ShowPanel(title, data);
         int brandId = AnsiConsole.Prompt(new TextPrompt<int>("Enter the brand ID for the product:"));
         data["BrandId"] = brandId.ToString();
 
-        await HandleAction(async () =>
+        await Helpers.HandleActionAsync(async () =>
         {
             var product = await productService.CreateAsync(name, price, quantity, brandId, CancellationToken.None);
             AnsiConsole.MarkupLine($"[green]Product '{product.Name}' registered successfully with ID {product.Id}.[/]");
         }, "Registering product...");
-    }
-
-    public async Task Update()
-    {
-        var data = new Dictionary<string, string>();
-        string title = "Updating Product";
-
-        int id = AnsiConsole.Prompt(new TextPrompt<int>("Enter the product ID to update:"));
-        data["Product ID"] = id.ToString();
-
-        ShowPanel(title, data);
-        string name = AnsiConsole.Prompt(
-            new TextPrompt<string>("Enter the new product name:"));
-        data["New Name"] = name;
-
-        ShowPanel(title, data);
-        decimal price = AnsiConsole.Prompt(
-            new TextPrompt<decimal>("Enter the new product price:")
-                .AllowEmpty());
-        data["New Price"] = price.ToString("C");
-
-        ShowPanel(title, data);
-        int quantity = AnsiConsole.Prompt(
-            new TextPrompt<int>("Enter the new product quantity:")
-                .AllowEmpty());
-        data["New Quantity"] = quantity.ToString();
-
-        await HandleAction(async () =>
-        {
-            var updatedProduct = await productService.UpdateAsync(id, name, price, quantity, CancellationToken.None);
-            AnsiConsole.MarkupLine($"[green]Product '{updatedProduct.Name}' updated successfully.[/]");
-        }, "Updating product...");
     }
 
     public async Task Delete()
@@ -105,9 +71,9 @@ public class ProductMenu(ProductService productService)
 
         int id = AnsiConsole.Prompt(new TextPrompt<int>("Enter the product ID to delete:"));
         data["Product ID"] = id.ToString();
-        ShowPanel(title, data);
+        Helpers.ShowPanel(title, data);
 
-        await HandleAction(async () =>
+        await Helpers.HandleActionAsync(async () =>
         {
             var deletedProduct = await productService.DeleteAsync(id, CancellationToken.None);
             AnsiConsole.MarkupLine($"[green]Product '{deletedProduct.Name}' deleted successfully.[/]");
@@ -118,7 +84,7 @@ public class ProductMenu(ProductService productService)
     {
         int id = AnsiConsole.Prompt(new TextPrompt<int>("Enter the product ID to search:"));
 
-        await HandleAction(async () =>
+        await Helpers.HandleActionAsync(async () =>
         {
             Product product = await productService.GetByIdAsync(id, CancellationToken.None);
             PrintProductTable([product]);
@@ -129,7 +95,7 @@ public class ProductMenu(ProductService productService)
     {
         string name = AnsiConsole.Prompt(new TextPrompt<string>("Enter the product name to search:"));
 
-        await HandleAction(async () =>
+        await Helpers.HandleActionAsync(async () =>
         {
             List<Product> products = await productService.SearchByNameAsync(name, CancellationToken.None);
             if (products.Count == 0)
@@ -141,7 +107,7 @@ public class ProductMenu(ProductService productService)
 
     public async Task ListAll()
     {
-        await HandleAction(async () =>
+        await Helpers.HandleActionAsync(async () =>
         {
             List<Product> products = await productService.GetAllAsync(CancellationToken.None);
             if (products.Count == 0)
@@ -156,7 +122,7 @@ public class ProductMenu(ProductService productService)
         int id = AnsiConsole.Prompt(new TextPrompt<int>("Enter the product ID:"));
         int amount = AnsiConsole.Prompt(new TextPrompt<int>("Enter the amount (use negative to remove stock):"));
 
-        await HandleAction(async () =>
+        await Helpers.HandleActionAsync(async () =>
         {
             var product = await productService.AddStockAsync(id, amount, CancellationToken.None);
             AnsiConsole.MarkupLine($"[green]Stock adjusted. '{product.Name}' now has {product.Quantity} units.[/]");
@@ -176,37 +142,5 @@ public class ProductMenu(ProductService productService)
             table.AddRow(product.Id.ToString(), product.Name, product.Price.ToString("C"), product.Quantity.ToString(), product.Brand.Name);
 
         AnsiConsole.Write(table);
-    }
-
-    private static async Task HandleAction(Func<Task> action, string processingMessage = "Processing...")
-    {
-        try
-        {
-            await AnsiConsole.Status()
-                .Spinner(Spinner.Known.Dots)
-                .StartAsync(processingMessage, async ctx =>
-                {
-                    await action();
-                });
-        }
-        catch (Exception ex)
-        {
-            AnsiConsole.MarkupLine($"[red]Error: {ex.Message}[/]");
-        }
-
-        AnsiConsole.WriteLine();
-        AnsiConsole.Prompt(new TextPrompt<string>("[grey]Press Enter to continue...[/]").AllowEmpty());
-    }
-
-    private static void ShowPanel(string title, Dictionary<string, string> data)
-    {
-        AnsiConsole.Clear();
-
-        var panel = new Panel(string.Join("\n", data.Select(kv => $"[grey]{kv.Key}:[/] [green]{kv.Value}[/]")))
-            .Header($"[bold]{title}[/]")
-            .Border(BoxBorder.Rounded);
-
-        AnsiConsole.Write(panel);
-        AnsiConsole.WriteLine();
     }
 }
