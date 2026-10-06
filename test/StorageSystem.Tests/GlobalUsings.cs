@@ -1,4 +1,5 @@
 global using StorageSystem.Domain.Entities;
+global using StorageSystem.Domain.Exceptions;
 
 global using StorageSystem.Application.Services;
 global using StorageSystem.Application.Repository;
