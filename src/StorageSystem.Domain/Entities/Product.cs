@@ -70,6 +70,8 @@ public class Product
 
     public void AddStock(int amount)
     {
+        GuardClause.AgainstNegativePrice(amount);
+
         if (Quantity + amount < 0)
         {
             throw new DomainException("Stock adjustment would result in negative quantity.");
