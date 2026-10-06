@@ -70,7 +70,7 @@ public class Product
 
     public void AddStock(int amount)
     {
-        GuardClause.AgainstNegativePrice(amount);
+        GuardClause.AgainstNegativeQuantity(amount);
 
         if (Quantity + amount < 0)
         {
