@@ -2,6 +2,8 @@ namespace StorageSystem.Tests.Domain;
 
 public class BrandTests
 {
+    // ---------- Create ----------
+
     [Fact]
     public void Create_WhenNameIsValid_ShouldReturnBrand()
     {
@@ -28,7 +30,7 @@ public class BrandTests
         Assert.NotNull(brand.Products);
         Assert.Empty(brand.Products);
     }
-    
+
     [Theory]
     [InlineData(null)]
     [InlineData("")]
@@ -51,6 +53,7 @@ public class BrandTests
         Assert.Equal(expected, brand.Name);
     }
 
+    // ---------- Rename ----------
 
     [Fact]
     public void Rename_WhenNameIsValid_ShouldUpdateBrandName()
