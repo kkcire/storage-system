@@ -1,12 +1,3 @@
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using StorageSystem.Application.Repository;
-using StorageSystem.Application.Services;
-using StorageSystem.Domain.Entities;
-using StorageSystem.Domain.Exceptions;
-using StorageSystem.Infrastructure.Data;
-using StorageSystem.Infrastructure.Repository;
-
 namespace StorageSystem.Tests.Application;
 
 public class ProductServiceTests : IDisposable
