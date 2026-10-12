@@ -10,7 +10,7 @@ public class ProductService(IProductRepository repository)
     public async Task<Product> CreateAsync(string name, decimal price, int quantity, int brandId, CancellationToken cancellationToken)
     {
         if (!await repository.BrandExistsAsync(brandId, cancellationToken))
-            throw new DomainException($"The brand with ID {brandId} does not exist.");
+            throw new KeyNotFoundException($"The brand with ID {brandId} does not exist.");
 
         var product = Product.Create(name, price, quantity, brandId);
 
@@ -38,8 +38,11 @@ public class ProductService(IProductRepository repository)
         return product;
     }
 
-    public async Task<Product> PatchAsync(int id, string? newName, decimal? newPrice, int? newQuantity, CancellationToken cancellationToken)
+    public async Task<Product> PatchAsync(int id, string? newName = null , decimal? newPrice = null, int? newQuantity = null, CancellationToken cancellationToken = default)
     {
+        if (newName is null && newPrice is null && newQuantity is null)
+            throw new DomainException("At least one field must be provided for patching.");
+
         var product = await repository.GetByIdAsync(id, cancellationToken);
         EnsureProductIsNotNull(product, id);
 
@@ -69,7 +72,7 @@ public class ProductService(IProductRepository repository)
         EnsureProductIsNotNull(product, id);
 
         if (!await repository.BrandExistsAsync(newBrandId, cancellationToken))
-            throw new DomainException($"The brand with ID {newBrandId} does not exist.");
+            throw new KeyNotFoundException($"The brand with ID {newBrandId} does not exist.");
 
         product.ChangeBrand(newBrandId);
 
