@@ -20,8 +20,8 @@ public class ProductRepository(StorageContext context) : IProductRepository
 
     public async Task<List<Product>> SearchByNameAsync(string name, CancellationToken ct)
         => await context.Products
-            .Include(p => p.Brand)
             .AsNoTracking()
+            .Include(p => p.Brand)
             .Where(p => p.Name.ToLower().Contains(name.ToLower()))
             .ToListAsync(ct);
 
