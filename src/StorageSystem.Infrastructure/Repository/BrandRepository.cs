@@ -29,7 +29,7 @@ public class BrandRepository(StorageContext context) : IBrandRepository
     public async Task<bool> ExistsBrandByNameAsync(string name, int ignoreId, CancellationToken ct)
         => await context.Brands.AnyAsync(brand => brand.Name.ToLower() == name.ToLower() && brand.Id != ignoreId, ct);
 
-    public async Task<bool> HasProductsAsync(int brandId, CancellationToken ct = default)
+    public async Task<bool> HasProductsAsync(int brandId, CancellationToken ct)
         => await context.Products.AnyAsync(p => p.BrandId == brandId, ct);
 
     public void Remove(Brand brand)
