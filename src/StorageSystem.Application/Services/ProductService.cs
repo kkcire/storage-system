@@ -38,7 +38,7 @@ public class ProductService(IProductRepository repository)
         return product;
     }
 
-    public async Task<Product> PatchAsync(int id, string? newName = null , decimal? newPrice = null, int? newQuantity = null, CancellationToken cancellationToken = default)
+    public async Task<Product> PatchAsync(int id, string? newName = null, decimal? newPrice = null, int? newQuantity = null, CancellationToken cancellationToken = default)
     {
         if (newName is null && newPrice is null && newQuantity is null)
             throw new DomainException("At least one field must be provided for patching.");
