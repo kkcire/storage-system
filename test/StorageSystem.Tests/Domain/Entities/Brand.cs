@@ -1,5 +1,6 @@
 namespace StorageSystem.Tests.Domain;
 
+[Trait("Category", "Unit")]
 public class BrandTests
 {
     // ---------- Create ----------
