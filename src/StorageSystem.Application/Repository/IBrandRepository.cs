@@ -4,14 +4,14 @@ namespace StorageSystem.Application.Repository;
 
 public interface IBrandRepository
 {
-    Task<Brand?> GetByIdAsync(int id, CancellationToken ct = default);
-    Task<List<Brand>> GetAllAsync(CancellationToken ct = default);
-    Task<List<Brand>> SearchByNameAsync(string name, CancellationToken ct = default);
-    Task AddAsync(Brand brand, CancellationToken ct = default);
-    Task<bool> ExistsBrandByNameAsync(string name, CancellationToken ct = default);
-    Task<bool> ExistsBrandByNameAsync(string name, int ignoreId, CancellationToken ct = default);
+    Task<Brand?> GetByIdAsync(int id, CancellationToken ct);
+    Task<List<Brand>> GetAllAsync(CancellationToken ct);
+    Task<List<Brand>> SearchByNameAsync(string name, CancellationToken ct);
+    Task AddAsync(Brand brand, CancellationToken ct);
+    Task<bool> ExistsBrandByNameAsync(string name, CancellationToken ct);
+    Task<bool> ExistsBrandByNameAsync(string name, int ignoreId, CancellationToken ct);
 
-    Task<bool> HasProductsAsync(int brandId, CancellationToken ct = default);
+    Task<bool> HasProductsAsync(int brandId, CancellationToken ct);
     void Remove(Brand brand);
-    Task SaveChangesAsync(CancellationToken ct = default);
+    Task SaveChangesAsync(CancellationToken ct);
 }
