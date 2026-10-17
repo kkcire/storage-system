@@ -14,8 +14,8 @@ public class ProductRepository(StorageContext context) : IProductRepository
 
     public async Task<List<Product>> GetAllAsync(CancellationToken ct)
         => await context.Products
-            .Include(p => p.Brand)
             .AsNoTracking()
+            .Include(p => p.Brand)
             .ToListAsync(ct);
 
     public async Task<List<Product>> SearchByNameAsync(string name, CancellationToken ct)
