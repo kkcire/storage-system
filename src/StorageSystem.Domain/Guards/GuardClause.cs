@@ -28,4 +28,10 @@ public static class GuardClause
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("The name cannot be null or empty.");
     }
+
+    public static void AgainstMaxLengthName(string name, int maxLength)
+    {
+        if (name.Length > maxLength)
+            throw new DomainException($"The name cannot exceed {maxLength} characters.");
+    }
 }
