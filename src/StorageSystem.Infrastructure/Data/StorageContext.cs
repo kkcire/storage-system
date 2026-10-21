@@ -10,18 +10,30 @@ public class StorageContext(DbContextOptions<StorageContext> options) : DbContex
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Brand>()
-            .HasIndex(b => b.Name)
-            .IsUnique();
+        modelBuilder.Entity<Brand>(brand =>
+        {
+            brand.Property(b => b.Name)
+                .IsRequired()
+                .HasMaxLength(Brand.MaxNameLength);
 
-        modelBuilder.Entity<Product>()
-            .HasIndex(p => p.Name)
-            .IsUnique();
+            brand.HasIndex(b => b.Name).IsUnique();
+        });
 
-        modelBuilder.Entity<Product>()
-            .HasOne(p => p.Brand)
-            .WithMany(b => b.Products)
-            .HasForeignKey(p => p.BrandId)
-            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Product>(product =>
+        {
+            product.Property(p => p.Name)
+                .IsRequired()
+                .HasMaxLength(Brand.MaxNameLength);
+
+            product.Property(p => p.Price)
+                .HasPrecision(18, 2);
+
+            product.HasIndex(p => p.Name).IsUnique();
+
+            product.HasOne(p => p.Brand)
+                .WithMany(b => b.Products)
+                .HasForeignKey(p => p.BrandId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 }
