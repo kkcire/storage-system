@@ -4,12 +4,16 @@ using StorageSystem.Infrastructure.Data;
 using StorageSystem.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 using StorageSystem.Console.UI;
+using Microsoft.Extensions.Configuration;
 
-var dbPath = Environment.GetEnvironmentVariable("STORAGE_DB_PATH")
-    ?? Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "storage.db");
+var configuration = new ConfigurationBuilder()
+    .AddUserSecrets<Program>()
+    .Build();
+
+var connectionString = configuration.GetConnectionString("DefaultConnection");
 
 var options = new DbContextOptionsBuilder<StorageContext>()
-    .UseSqlite($"Data Source={dbPath}")
+    .UseSqlServer(connectionString)
     .Options;
 
 StorageContext context = new(options);
