@@ -12,6 +12,8 @@ public class Product
     public int BrandId { get; private set; }
     public Brand Brand { get; private set; } = default!;
 
+    public static readonly int MaxNameLength = 100;
+
     private Product() { } // EF Core
 
     public static Product Create(string name, decimal price, int quantity, int brandId)
@@ -20,6 +22,7 @@ public class Product
         GuardClause.AgainstNegativePrice(price);
         GuardClause.AgainstNegativeQuantity(quantity);
         GuardClause.AgainstZeroOrNegativeId(brandId);
+        GuardClause.AgainstMaxLengthName(name, MaxNameLength);
 
         return new Product
         {
@@ -33,6 +36,7 @@ public class Product
     public void Rename(string newName)
     {
         GuardClause.AgainstNullOrWhiteSpaceName(newName);
+        GuardClause.AgainstMaxLengthName(newName, MaxNameLength);
 
         Name = newName.Trim();
     }
