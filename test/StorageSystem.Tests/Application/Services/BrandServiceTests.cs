@@ -3,21 +3,14 @@ namespace StorageSystem.Tests.Application;
 [Trait("Category", "Integration")]
 public class BrandServiceTests : IDisposable
 {
-    private readonly SqliteConnection _connection;
+    private readonly SqlServerTestDatabase _database;
     private readonly StorageContext _context;
     private readonly BrandService _service;
 
     public BrandServiceTests()
     {
-        _connection = new SqliteConnection("DataSource=:memory:");
-        _connection.Open();
-
-        var options = new DbContextOptionsBuilder<StorageContext>()
-            .UseSqlite(_connection)
-            .Options;
-
-        _context = new StorageContext(options);
-        _context.Database.EnsureCreated();
+        _database = new SqlServerTestDatabase();
+        _context = _database.CreateContext();
 
         IBrandRepository brandRepository = new BrandRepository(_context);
         _service = new BrandService(brandRepository);
@@ -26,7 +19,7 @@ public class BrandServiceTests : IDisposable
     public void Dispose()
     {
         _context.Dispose();
-        _connection.Dispose();
+        _database.Dispose();
     }
 
     // ---------- CreateAsync ----------

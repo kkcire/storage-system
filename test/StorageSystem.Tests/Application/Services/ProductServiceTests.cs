@@ -3,21 +3,14 @@ namespace StorageSystem.Tests.Application;
 [Trait("Category", "Integration")]
 public class ProductServiceTests : IDisposable
 {
-    private readonly SqliteConnection _connection;
+    private readonly SqlServerTestDatabase _database;
     private readonly StorageContext _context;
     private readonly ProductService _service;
 
     public ProductServiceTests()
     {
-        _connection = new SqliteConnection("DataSource=:memory:");
-        _connection.Open();
-
-        var options = new DbContextOptionsBuilder<StorageContext>()
-            .UseSqlite(_connection)
-            .Options;
-
-        _context = new StorageContext(options);
-        _context.Database.EnsureCreated();
+        _database = new SqlServerTestDatabase();
+        _context = _database.CreateContext();
 
         IProductRepository productRepository = new ProductRepository(_context);
         _service = new ProductService(productRepository);
@@ -26,7 +19,7 @@ public class ProductServiceTests : IDisposable
     public void Dispose()
     {
         _context.Dispose();
-        _connection.Dispose();
+        _database.Dispose();
     }
 
     private async Task<Brand> CreateBrandAsync(string name = "AMD")

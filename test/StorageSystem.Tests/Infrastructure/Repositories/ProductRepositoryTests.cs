@@ -3,21 +3,14 @@ namespace StorageSystem.Tests.Infrastructure;
 [Trait("Category", "Integration")]
 public class ProductRepositoryTests : IDisposable
 {
-    private readonly SqliteConnection _connection;
+    private readonly SqlServerTestDatabase _database;
     private readonly StorageContext _context;
     private readonly ProductRepository _repository;
 
     public ProductRepositoryTests()
     {
-        _connection = new SqliteConnection("DataSource=:memory:");
-        _connection.Open();
-
-        var options = new DbContextOptionsBuilder<StorageContext>()
-            .UseSqlite(_connection)
-            .Options;
-
-        _context = new StorageContext(options);
-        _context.Database.EnsureCreated();
+        _database = new SqlServerTestDatabase();
+        _context = _database.CreateContext();
 
         _repository = new ProductRepository(_context);
     }
@@ -25,7 +18,7 @@ public class ProductRepositoryTests : IDisposable
     public void Dispose()
     {
         _context.Dispose();
-        _connection.Dispose();
+        _database.Dispose();
     }
 
     private async Task<Brand> CreateBrandAsync(string name = "AMD")
@@ -216,7 +209,7 @@ public class ProductRepositoryTests : IDisposable
         _context.Products.Add(product);
         await _context.SaveChangesAsync();
 
-        // Act — "Ryzen 7" existe, mas é o próprio produto
+        // Act - "Ryzen 7" exists, but is the same product
         var exists = await _repository.ExistsProductByNameAsync("Ryzen 7", ignoreId: product.Id, CancellationToken.None);
 
         // Assert

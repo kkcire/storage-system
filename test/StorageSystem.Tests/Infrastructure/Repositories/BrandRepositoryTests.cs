@@ -1,29 +1,18 @@
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using StorageSystem.Domain.Entities;
-using StorageSystem.Infrastructure.Data;
-using StorageSystem.Infrastructure.Repository;
+using StorageSystem.Tests.Infrastructure;
 
 namespace StorageSystem.Tests.Infrastructure.Repositories;
 
 [Trait("Category", "Integration")]
 public class BrandRepositoryTests : IDisposable
 {
-    private readonly SqliteConnection _connection;
+    private readonly SqlServerTestDatabase _database;
     private readonly StorageContext _context;
     private readonly BrandRepository _repository;
 
     public BrandRepositoryTests()
     {
-        _connection = new SqliteConnection("DataSource=:memory:");
-        _connection.Open();
-
-        var options = new DbContextOptionsBuilder<StorageContext>()
-            .UseSqlite(_connection)
-            .Options;
-
-        _context = new StorageContext(options);
-        _context.Database.EnsureCreated();
+        _database = new SqlServerTestDatabase();
+        _context = _database.CreateContext();
 
         _repository = new BrandRepository(_context);
     }
@@ -31,7 +20,7 @@ public class BrandRepositoryTests : IDisposable
     public void Dispose()
     {
         _context.Dispose();
-        _connection.Dispose();
+        _database.Dispose();
     }
 
     private async Task<Brand> AddBrandAsync(string name)
@@ -207,7 +196,7 @@ public class BrandRepositoryTests : IDisposable
         // Arrange
         var brand = await AddBrandAsync("AMD");
 
-        // Act — "AMD" existe, mas é a própria brand
+        // Act - "AMD" exists, but is the same brand
         var exists = await _repository.ExistsBrandByNameAsync("AMD", ignoreId: brand.Id, CancellationToken.None);
 
         // Assert

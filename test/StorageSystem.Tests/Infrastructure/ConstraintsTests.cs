@@ -1,33 +1,21 @@
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using StorageSystem.Domain.Entities;
-using StorageSystem.Infrastructure.Data;
-
 namespace StorageSystem.Tests.Infrastructure;
 
 [Trait("Category", "Integration")]
 public class ConstraintsTests : IDisposable
 {
-    private readonly SqliteConnection _connection;
+    private readonly SqlServerTestDatabase _database;
     private readonly StorageContext _context;
 
     public ConstraintsTests()
     {
-        _connection = new SqliteConnection("DataSource=:memory:");
-        _connection.Open();
-
-        var options = new DbContextOptionsBuilder<StorageContext>()
-            .UseSqlite(_connection)
-            .Options;
-
-        _context = new StorageContext(options);
-        _context.Database.EnsureCreated();
+        _database = new SqlServerTestDatabase();
+        _context = _database.CreateContext();
     }
 
     public void Dispose()
     {
         _context.Dispose();
-        _connection.Dispose();
+        _database.Dispose();
     }
 
     // ---------- Unique index: Brand.Name ----------
