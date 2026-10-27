@@ -14,7 +14,7 @@ The application manages products and brands through a console interface built wi
 * Brand registration and management
 * Products linked to brands
 * CRUD operations for products and brands
-* Persistence with Entity Framework Core and SQLite
+* Persistence with Entity Framework Core and SQL Server
 * Business-rule validation
 
 ## Tech Stack
@@ -22,7 +22,7 @@ The application manages products and brands through a console interface built wi
 * C#
 * .NET 8
 * Entity Framework Core
-* SQLite
+* SQL Server
 * xUnit
 * Spectre.Console
 
@@ -30,25 +30,25 @@ The application manages products and brands through a console interface built wi
 
 ```text
 StorageSystem/
-├── src/
-│   ├── StorageSystem.Domain/
-│   │   ├── Entities/
-│   │   ├── Services/
-│   │   └── Data/
-│   │
-│   └── StorageSystem.Console/
-│       └── UI/
-│
-└── test/
-    └── StorageSystem.Tests/
-        └── Services/
+|---- src/
+|   |---- StorageSystem.Domain/
+|   |   |---- Entities/
+|   |   |---- Services/
+|   |   `---- Data/
+|   |
+|   `---- StorageSystem.Console/
+|       `---- UI/
+|
+`---- test/
+    `---- StorageSystem.Tests/
+        `---- Services/
 ```
 
 ## What I Learned
 
 This project was a great opportunity to apply theoretical concepts in a single, practical application. Main takeaways include:
 
-* Data persistence, object-relational mapping, and managing database relationships with EF Core and SQLite.
+* Data persistence, object-relational mapping, and managing database relationships with EF Core and SQL Server.
 * Applying OOP principles, dependency injection, and decoupling business rules from the UI layer.
 * Writing tests with xUnit and using an in-memory database to test logic.
 
@@ -67,10 +67,16 @@ cd storage-system
 
 ### Setup
 
-Before running the application for the first time, apply the database migrations:
+Configure a SQL Server connection string (Docker, local instance, or LocalDB) in one of these ways:
+
+* `src/StorageSystem.Console/appsettings.json` (`ConnectionStrings:DefaultConnection`)
+* User Secrets
+* Environment variable `ConnectionStrings__DefaultConnection`
+
+Then apply the database migrations:
 
 ```bash
-dotnet ef database update --project src/StorageSystem.Domain
+dotnet ef database update --project src/StorageSystem.Infrastructure --startup-project src/StorageSystem.Console
 ```
 
 ### Run
@@ -84,3 +90,7 @@ dotnet run --project src/StorageSystem.Console
 ```bash
 dotnet test
 ```
+
+> Integration tests use SQLite in-memory databases, so they do not require LocalDB,
+> SQL Server, Docker, or any machine-specific connection string. The application
+> itself continues to use SQL Server through the Infrastructure layer.
