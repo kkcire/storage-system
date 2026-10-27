@@ -5,13 +5,13 @@ namespace StorageSystem.Tests.Infrastructure.Repositories;
 [Trait("Category", "Integration")]
 public class BrandRepositoryTests : IDisposable
 {
-    private readonly SqliteTestDatabase _database;
+    private readonly SqlServerTestDatabase _database;
     private readonly StorageContext _context;
     private readonly BrandRepository _repository;
 
     public BrandRepositoryTests()
     {
-        _database = new SqliteTestDatabase();
+        _database = new SqlServerTestDatabase();
         _context = _database.CreateContext();
 
         _repository = new BrandRepository(_context);

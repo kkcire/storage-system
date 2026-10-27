@@ -50,7 +50,7 @@ This project was a great opportunity to apply theoretical concepts in a single, 
 
 * Data persistence, object-relational mapping, and managing database relationships with EF Core and SQL Server.
 * Applying OOP principles, dependency injection, and decoupling business rules from the UI layer.
-* Writing tests with xUnit and using an in-memory database to test logic.
+* Writing tests with xUnit against a SQL Server test database.
 
 ## Getting Started
 
@@ -91,6 +91,6 @@ dotnet run --project src/StorageSystem.Console
 dotnet test
 ```
 
-> Integration tests use SQLite in-memory databases, so they do not require LocalDB,
-> SQL Server, Docker, or any machine-specific connection string. The application
-> itself continues to use SQL Server through the Infrastructure layer.
+> Integration tests run against SQL Server. By default, they use the
+> `(localdb)\MSSQLLocalDB` instance. To use another instance, set
+> `STORAGE_SQLSERVER_TEST_CONNECTION` before running the tests.

@@ -3,12 +3,12 @@ namespace StorageSystem.Tests.Infrastructure;
 [Trait("Category", "Integration")]
 public class ConstraintsTests : IDisposable
 {
-    private readonly SqliteTestDatabase _database;
+    private readonly SqlServerTestDatabase _database;
     private readonly StorageContext _context;
 
     public ConstraintsTests()
     {
-        _database = new SqliteTestDatabase();
+        _database = new SqlServerTestDatabase();
         _context = _database.CreateContext();
     }
 
