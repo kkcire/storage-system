@@ -3,13 +3,13 @@ namespace StorageSystem.Tests.Application;
 [Trait("Category", "Integration")]
 public class ProductServiceTests : IDisposable
 {
-    private readonly SqlServerTestDatabase _database;
+    private readonly SqliteTestDatabase _database;
     private readonly StorageContext _context;
     private readonly ProductService _service;
 
     public ProductServiceTests()
     {
-        _database = new SqlServerTestDatabase();
+        _database = new SqliteTestDatabase();
         _context = _database.CreateContext();
 
         IProductRepository productRepository = new ProductRepository(_context);

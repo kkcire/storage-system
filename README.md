@@ -91,5 +91,6 @@ dotnet run --project src/StorageSystem.Console
 dotnet test
 ```
 
-> Integration tests run against SQL Server LocalDB by default.  
-> To target another SQL Server instance, set `STORAGE_SQLSERVER_TEST_CONNECTION`.
+> Integration tests use SQLite in-memory databases, so they do not require LocalDB,
+> SQL Server, Docker, or any machine-specific connection string. The application
+> itself continues to use SQL Server through the Infrastructure layer.
