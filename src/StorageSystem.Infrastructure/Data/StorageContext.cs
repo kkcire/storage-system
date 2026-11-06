@@ -23,7 +23,7 @@ public class StorageContext(DbContextOptions<StorageContext> options) : DbContex
         {
             product.Property(p => p.Name)
                 .IsRequired()
-                .HasMaxLength(Brand.MaxNameLength);
+                .HasMaxLength(Product.MaxNameLength);
 
             product.Property(p => p.Price)
                 .HasPrecision(18, 2);
