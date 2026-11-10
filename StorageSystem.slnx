@@ -1,0 +1,16 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="src/StorageSystem.Application/StorageSystem.Application.csproj" />
+    <Project Path="src/StorageSystem.Console/StorageSystem.Console.csproj" />
+    <Project Path="src/StorageSystem.Domain/StorageSystem.Domain.csproj" />
+    <Project Path="src/StorageSystem.Infrastructure/StorageSystem.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/StorageSystem.Tests/StorageSystem.Tests.csproj" />
+  </Folder>
+</Solution>
